@@ -1,57 +1,48 @@
 import { useEffect } from "react";
 import SetLocation from "./components/konva/konva.tsx";
 import { useWebSocket } from "./websocket";
-import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
-import SendButton from "./components/send-button/SendButton.tsx";
-import EspConnectingInfo from "./components/esp-connecting-info/EspConnectingInfo.tsx";
-import SideArm from "./components/side-arm/SideArm.tsx";
-import StopButton from "./components/stop-button/StopButton.tsx";
-import FrontArmButtons from "./components/front-arms-buttons/FrontArmButtons.tsx";
-import "./App.css";
-import Preset from "./components/preset/Preset.tsx";
 import {
   ChakraProvider,
   defaultSystem,
+  Box,
   HStack,
   VStack,
 } from "@chakra-ui/react";
-
-import WebSocketConnecting from "./components/websocket-connectiong/WebSocketConnecting.tsx";
+import { BeltoOutputSlider } from "./components/Belt-output-slider/Belt-output-slider.tsx";
+import { Preset } from "./components/preset/Preset.tsx";
+import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
 
 const App = () => {
   const { connect, disconnect } = useWebSocket();
 
   useEffect(() => {
     connect();
-    return () => disconnect();
+
+    return () => {
+      disconnect();
+    };
   }, [connect, disconnect]);
 
   return (
     <ChakraProvider value={defaultSystem}>
-      <div className="buttons">
-        <VStack>
-          <HStack>
-            <StopButton />
-            <SendButton />
-            <ChangeThemeButton />
-          </HStack>
+      <HStack w="100vw" h="100vh" gap={0} align="stretch" overflow="hidden">
+        <Box w="60%" h="100%" flexShrink={0}>
           <SetLocation />
-        </VStack>
+        </Box>
 
-        <div>
-          <VStack>
-            <SideArm />
-            <FrontArmButtons />
-          </VStack>
-        </div>
-        <VStack>
-          <HStack p={4}>
-            <EspConnectingInfo />
-            <WebSocketConnecting />
-          </HStack>
+        <VStack
+          w="40%"
+          h="100%"
+          align="stretch"
+          justify="flex-start"
+          gap={4}
+          p={4}
+        >
+          <ChangeThemeButton />
+          <BeltoOutputSlider />
           <Preset />
         </VStack>
-      </div>
+      </HStack>
     </ChakraProvider>
   );
 };
