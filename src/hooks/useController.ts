@@ -13,6 +13,10 @@ interface TargetPositionStoreType {
 	setEmptyTargetPosition: (emptyJudge: boolean) => void;
 	show: boolean;
 	setShow: (showJudge: boolean) => void;
+	shootPwm: number;
+	setShootPwm: (pwm: number) => void;
+	shootTime: number;
+	setShootTime: (time: number) => void;
 }
 
 export const useController = create<TargetPositionStoreType>((set) => ({
@@ -22,9 +26,10 @@ export const useController = create<TargetPositionStoreType>((set) => ({
 	},
 	setTargetPosition: (positionInfomation: Position) =>
 		set({ targetPosition: positionInfomation }),
+
 	targetPositionScale: {
 		x: setting.defaultRobotPosition.x / setting.fieldSize.width,
-		y: setting.defaultRobotPosition.y / setting.fieldSize.width,
+		y: setting.defaultRobotPosition.y / setting.fieldSize.height,
 	},
 	setTargetPositionScale: (positionInfomation: Position) => {
 		set({
@@ -44,6 +49,10 @@ export const useController = create<TargetPositionStoreType>((set) => ({
 	},
 	show: false,
 	setShow: (showJudge: boolean) => set({ show: showJudge }),
+	shootPwm: 0,
+	setShootPwm: (pwm: number) => set({ shootPwm: pwm }),
+	shootTime: 0.0,
+	setShootTime: (time: number) => set({ shootTime: time }),
 }));
 
 type ColorMode = "blue" | "red";
