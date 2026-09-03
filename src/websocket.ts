@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import ReconnectingWebSocket from "reconnecting-websocket";
-import type { Status } from "./controller";
+import type { Status,ToFStatus } from "./controller";
 import { setting } from "./controller";
 import type { Commands } from "./commandsType";
 
@@ -14,8 +14,7 @@ interface WebSocketState {
 	espConnecting: boolean;
 	status: "ERROR" | "CONNECTING" | "CLOSE";
 	socket: ReconnectingWebSocket | null;
-	tofDistance: number;
-	tofDegree: number;
+	tofStatus: ToFStatus;
 	sendMessage: (data: Commands) => void;
 	connect: () => void;
 	disconnect: () => void;
@@ -24,18 +23,21 @@ interface WebSocketState {
 export const useWebSocket = create<WebSocketState>((set, get) => ({
 	socket: null,
 	espConnecting: false,
+	status: "CLOSE",
 	realtimeStatus: {
 		x: setting.defaultRobotPosition.x / setting.fieldSize.width,
 		y: setting.defaultRobotPosition.y / setting.fieldSize.height,
 		theta: setting.defaultRobotPosition.theta,
 	},
-	status: "CLOSE",
-	tofDistance: 0,
-	tofDegree: 0,
+	tofStatus: {
+		distance: 0,
+		degree: 0
+	},
+	
 	connect: () => {
 		if (get().socket) return;
 
-		const socket = new ReconnectingWebSocket("ws://192.168.11.10:3000/");
+		const socket = new ReconnectingWebSocket("ws://192.168.151.188:3000/");
 
 		socket.onopen = () => {
 			console.log("WebSocket connected");
@@ -65,18 +67,24 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
                             },
                         });
                         break;
+
 					case "tof_senser":
 						set({
-							tofDistance: receivedData.distance,
-							tofDegree: receivedData.ToFdegree,
+							tofStatus: {
+								distance: receivedData.distance,
+								degree: receivedData.ToFdegree,
+							}
 						});
 						break;
+
 					case "connection_failed":
 						set({ espConnecting: false });
 						break;
+
 					case "connection_success":
 						set({ espConnecting: true });
 						break;
+
 					default:
 						break;
 				}

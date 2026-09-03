@@ -7,6 +7,11 @@ export type Status = Position & {
   theta: number;
 };
 
+export type ToFStatus = {
+  distance: number;
+  degree: number;
+};
+
 class Setting {
   fieldSize = { width: 5250, height: 10500 };
   robotSize = { width: 1000, height: 1000 };
