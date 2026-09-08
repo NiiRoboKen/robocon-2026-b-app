@@ -1,9 +1,15 @@
 import { Box, Slider } from "@chakra-ui/react";
+import { useController } from "../../hooks/useController";
 
 export const BeltoOutputSlider = () => {
+  const {shootPwm, setShootPwm} = useController();
   return (
     <Box pt="30px">
-      <Slider.Root width="300px" defaultValue={[2999]} min={0} max={2999}>
+      <Slider.Root width="300px" 
+        defaultValue={[shootPwm]} 
+        min={0} max={2999} 
+        onValueChangeEnd={(e) => setShootPwm(e.value[0])}
+      >
         <Slider.Control>
           <Slider.Track>
             <Slider.Range />
