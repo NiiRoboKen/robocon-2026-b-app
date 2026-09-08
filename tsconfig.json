@@ -1,8 +1,7 @@
 {
  "compilerOptions": {
-		"baseUrl": "src",
     "types": ["react"],
-    "moduleResolution": "node"
+    "moduleResolution": "bundler",
  },
 
 
