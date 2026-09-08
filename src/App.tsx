@@ -13,6 +13,7 @@ import {
 import { BeltoOutputSlider } from "./components/Belt-output-slider/Belt-output-slider.tsx";
 import { Preset } from "./components/preset/Preset.tsx";
 import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
+import  AllStopButton from "./components/stop-button/StopButton.tsx";
 
 type Pose = {
   x: number;
@@ -89,6 +90,7 @@ const App = () => {
           p={4}
         >
           <ChangeThemeButton />
+          <AllStopButton />
           <BeltoOutputSlider />
           <Preset />
         </VStack>

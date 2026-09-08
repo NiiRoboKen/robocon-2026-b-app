@@ -1,3 +1,250 @@
-.StopButton {
-  background-color: red;
+.emergency-panel {
+  width: 280px;
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  background: #15181c;
+  border-radius: 20px;
+
+  text-align: center;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================
+   黄色い土台
+   ========================= */
+
+.emergency-button {
+  position: relative;
+
+  width: 220px;
+  height: 220px;
+
+  margin: 0 auto;
+
+  border-radius: 22px;
+
+  background: #ffd900;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 8px 0 #a88700,
+    0 15px 25px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================
+   しましま
+   ========================= */
+.emergency-stripes {
+  position: relative;
+
+  width: 175px;
+  height: 175px;
+
+  border-radius: 50%;
+
+  background: repeating-linear-gradient(45deg,
+      #111 0 20px,
+      #ffd900 20px 40px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  perspective: 500px;
+}
+
+
+/* =========================
+   赤いボタン
+   ========================= */
+
+.emergency-button__red {
+  position: relative;
+  z-index: 1;
+
+  width: 125px;
+  height: 125px;
+
+  padding: 0;
+
+  border-radius: 50%;
+  border: 7px solid #a00000;
+
+  background: linear-gradient(145deg,
+      #ff3838,
+      #c90000);
+
+  color: white;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 0 #710000,
+    inset 0 6px 10px rgba(255, 255, 255, 0.25),
+    0 8px 15px rgba(0, 0, 0, 0.4);
+
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+}
+
+
+/* 押したとき */
+.emergency-button__red:active:not(:disabled) {
+  transform: translateY(8px);
+
+  box-shadow:
+    0 2px 0 #710000,
+    inset 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* カバーが閉じている間 */
+.emergency-button__red:disabled {
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   透明カバー
+   ========================= */
+
+.emergency-cover {
+  position: absolute;
+  z-index: 2;
+
+  width: 155px;
+  height: 155px;
+
+  left: 50%;
+  top: 50%;
+
+  padding: 0;
+  box-sizing: border-box;
+
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+
+  background: rgba(220, 230, 235, 0.38);
+
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.35);
+
+  cursor: pointer;
+
+  transform: translate(-50%, -50%);
+
+  /*
+   * カバーの上端をヒンジにする
+   */
+  transform-origin: 50% 0%;
+
+  transition:
+    transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* =========================
+   カバーを開いた状態
+   ========================= */
+
+.emergency-cover--open {
+  /*
+   * 上端を支点にして手前から上へ開く
+   */
+  transform:
+    translate(-50%, -50%) rotateX(65deg);
+
+  opacity: 1;
+
+  pointer-events: none;
+}
+
+/* =========================
+   カバーの光
+   ========================= */
+
+.emergency-cover::before {
+  content: "";
+
+  position: absolute;
+
+  width: 75px;
+  height: 25px;
+
+  top: 20px;
+  left: 25px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.45);
+
+  transform: rotate(-25deg);
+
+  filter: blur(3px);
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   カバーの取っ手
+   ========================= */
+
+.cover-handle {
+  position: absolute;
+
+  width: 45px;
+  height: 12px;
+
+  top: -10px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  border-radius: 8px;
+
+  background: #333;
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+
+/* =========================
+   下の表示
+   ========================= */
+
+.emergency-label {
+  margin-top: 25px;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  background: #e60000;
+
+  color: white;
+
+  font-size: 22px;
+  font-weight: bold;
+
+  box-shadow:
+    0 4px 0 #8b0000;
 }
