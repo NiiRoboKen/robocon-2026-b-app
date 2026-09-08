@@ -3,7 +3,7 @@ import { Box, Slider } from "@chakra-ui/react";
 export const BeltoOutputSlider = () => {
   return (
     <Box pt="30px">
-      <Slider.Root width="300px" defaultValue={[40]} min={0} max={100}>
+      <Slider.Root width="300px" defaultValue={[2999]} min={0} max={2999}>
         <Slider.Control>
           <Slider.Track>
             <Slider.Range />
