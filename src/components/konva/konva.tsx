@@ -1,8 +1,6 @@
-import Konva from "konva";
-import { useRef } from "react";
-import { Stage, Layer, Line, Image } from "react-konva";
-import { setting, ModeTheme } from "../../controller";
 import { useModeStore } from "../../hooks/useController";
+import { ModeTheme, setting } from "../../controller";
+import { Stage, Layer, Image, Line } from "react-konva";
 import useImage from "use-image";
 
 const SetLocation = () => {
@@ -11,15 +9,13 @@ const SetLocation = () => {
 
   const [fieldImage] = useImage(colorTheme.fieldImageSrc);
 
-  const stageRef = useRef<Konva.Stage | null>(null);
-
   return (
     <Stage
       width={setting.fieldSizeScale.width}
       height={setting.fieldSizeScale.height}
-      ref={stageRef}
     >
       <Layer>
+        {/* フィールド画像 */}
         <Image
           image={fieldImage}
           x={0}
@@ -28,6 +24,7 @@ const SetLocation = () => {
           height={setting.fieldSizeScale.height}
         />
 
+        {/* フィールドの囲い */}
         <Line
           points={[
             0,
@@ -43,6 +40,7 @@ const SetLocation = () => {
           ]}
           stroke={colorTheme.colors.other}
           strokeWidth={10}
+          closed
         />
       </Layer>
     </Stage>
