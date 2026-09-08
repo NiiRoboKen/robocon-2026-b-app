@@ -49,9 +49,9 @@ export const useController = create<TargetPositionStoreType>((set) => ({
 	},
 	show: false,
 	setShow: (showJudge: boolean) => set({ show: showJudge }),
-	shootPwm: 0,
+	shootPwm: 2999,
 	setShootPwm: (pwm: number) => set({ shootPwm: pwm }),
-	shootTime: 0.0,
+	shootTime: 0.125,
 	setShootTime: (time: number) => set({ shootTime: time }),
 }));
 
