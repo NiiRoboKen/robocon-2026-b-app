@@ -7,7 +7,7 @@ export const LaunchButton = () => {
 
   const handleLaunch = () => {
     sendMessage({
-      command: "set_shoot",
+      command: "shoot",
       pwm: shootPwm,
       time: shootTime,
     });
