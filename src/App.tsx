@@ -194,8 +194,8 @@ const App = () => {
 
             <AllStopButton />
             <ChangeThemeButton />
-            <LaunchButton />
             <BeltoOutputSlider />
+            <LaunchButton />
             <Preset />
           </VStack>
         </HStack>
