@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import SetLocation from "./components/konva/konva.tsx";
 import { Robot } from "./components/robot/Robot.tsx";
@@ -28,16 +28,33 @@ type Pose = {
   theta: number;
 };
 
+const FIELD_W = 6000;
+const ORIGIN_X = 1800;
+const ORIGIN_Y = 500;
+
 const App = () => {
   const { connect, disconnect } = useWebSocket();
   const { mode } = useModeStore();
+
   const theme = mode as ThemeType;
 
-  const [pose, setPose] = useState<Pose>({
-    x: 0,
-    y: 0,
-    theta: 0,
-  });
+  const initialPose = useMemo<Pose>(() => {
+    if (theme === "blue") {
+      return {
+        x: ORIGIN_X,
+        y: ORIGIN_Y,
+        theta: 0,
+      };
+    }
+
+    return {
+      x: FIELD_W - ORIGIN_X,
+      y: ORIGIN_Y,
+      theta: 0,
+    };
+  }, [theme]);
+
+  const [pose, setPose] = useState<Pose>(initialPose);
 
   const fieldRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +62,10 @@ const App = () => {
     w: 1,
     h: 1,
   });
+
+  useEffect(() => {
+    setPose(initialPose);
+  }, [initialPose]);
 
   useEffect(() => {
     connect();
@@ -78,6 +99,20 @@ const App = () => {
       observer.disconnect();
     };
   }, []);
+
+  const displayCoord = useMemo(() => {
+    if (theme === "blue") {
+      return {
+        x: pose.x - ORIGIN_X,
+        y: pose.y - ORIGIN_Y,
+      };
+    }
+
+    return {
+      x: FIELD_W - pose.x - ORIGIN_X,
+      y: pose.y - ORIGIN_Y,
+    };
+  }, [pose, theme]);
 
   return (
     <ChakraProvider value={defaultSystem}>
@@ -150,8 +185,8 @@ const App = () => {
           >
             <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
-                x={pose.x}
-                y={pose.y}
+                x={displayCoord.x}
+                y={displayCoord.y}
                 theta={pose.theta}
                 connected={true}
               />
