@@ -7,7 +7,6 @@ export type Commands =
   | CurrentLocation
   | SetLocation
   | ToFSenser
-  | SetShoot
   | Shoot;
 
 export type ReceiveSuccess = {
@@ -51,12 +50,8 @@ export type ToFSenser = {
   ToFdegree: number;
 };
 
-export type SetShoot = {
-  command: "set_shoot";
-  pwm: number;
-  time: number;
-};
-
 export type Shoot = {
   command: "shoot";
+  pwm: number;
+  time: number;
 };
