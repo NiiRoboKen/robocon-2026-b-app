@@ -11,7 +11,6 @@ const AllStopButton = () => {
     <div className="emergency-panel">
       <div className="emergency-button">
         <div className="emergency-stripes">
-
           {/* 赤い非常停止ボタン */}
           <button
             className="emergency-button__red"
@@ -35,12 +34,7 @@ const AllStopButton = () => {
           >
             <span className="cover-handle" />
           </button>
-
         </div>
-      </div>
-
-      <div className="emergency-label">
-        ⚠ 緊急停止
       </div>
     </div>
   );
