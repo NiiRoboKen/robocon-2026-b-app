@@ -25,8 +25,8 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
   espConnecting: false,
   status: "CLOSE",
   realtimeStatus: {
-    x: setting.defaultRobotPosition.x / setting.fieldSize.width,
-    y: setting.defaultRobotPosition.y / setting.fieldSize.height,
+    x: setting.defaultRobotPosition.x,
+    y: setting.defaultRobotPosition.y,
     theta: setting.defaultRobotPosition.theta,
   },
   tofStatus: {
@@ -61,8 +61,8 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
           case "current_location":
             set({
               realtimeStatus: {
-                x: receivedData.x / setting.fieldSize.width,
-                y: receivedData.y / setting.fieldSize.height,
+                x: receivedData.x,
+                y: receivedData.y,
                 theta: receivedData.degree,
               },
             });
