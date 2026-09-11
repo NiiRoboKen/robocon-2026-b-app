@@ -179,9 +179,9 @@ const App = () => {
             minH={0}
             align="stretch"
             justify="flex-start"
-            gap={4}
+            gap={3}
             m={0}
-            p={4}
+            p={3}
             overflow="hidden"
           >
             <Box flexShrink={0} m={0} p={0}>
@@ -192,12 +192,28 @@ const App = () => {
                 connected={status === "CONNECTING" && espConnecting}
               />
             </Box>
-
-            <AllStopButton />
-            <ChangeThemeButton />
-            <BeltoOutputSlider />
-            <LaunchButton />
-            <Preset />
+            <Box flexShrink={0} display="flex" justifyContent="center">
+              <AllStopButton />
+            </Box>
+            <Box flexShrink={0} display="flex" justifyContent="center">
+              <ChangeThemeButton />
+            </Box>
+            <Box flexShrink={0} display="flex" justifyContent="center">
+              <BeltoOutputSlider />
+            </Box>
+            <Box flexShrink={0} display="flex" justifyContent="center">
+              <LaunchButton />
+            </Box>
+            <Box
+              flex="1"
+              minH={0}
+              overflow="visible"
+              display="flex"
+              justifyContent="center"
+              alignItems="flex-start"
+            >
+              <Preset />
+            </Box>
           </VStack>
         </HStack>
       </Box>
