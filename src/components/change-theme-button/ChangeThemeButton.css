@@ -1,3 +1,100 @@
 .change-theme-button {
-	background-color: #00ff7f;
+  position: relative;
+  padding: 14px 28px;
+  border: 3px solid #fff;
+  border-radius: 12px;
+
+  background: linear-gradient(90deg, #ff1744, #2979ff);
+  color: white;
+
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 2px;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  box-shadow:
+    0 0 8px #ff1744,
+    0 0 16px #2979ff,
+    0 0 30px rgba(255, 255, 255, 0.8);
+
+  transition:
+    transform 0.1s,
+    box-shadow 0.2s;
+}
+
+/* 光が横切る */
+.change-theme-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.9),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+  animation: theme-shine 1.5s infinite;
+}
+
+/* ボタン全体をチカチカ */
+.change-theme-button {
+  animation: theme-flash 1.2s infinite;
+}
+
+.change-theme-button:hover {
+  transform: scale(1.08);
+
+  box-shadow:
+    0 0 12px #ff1744,
+    0 0 25px #2979ff,
+    0 0 50px white;
+}
+
+.change-theme-button:active {
+  transform: scale(0.92);
+}
+
+/* 光が走る */
+@keyframes theme-shine {
+  0% {
+    left: -100%;
+  }
+
+  50%,
+  100% {
+    left: 150%;
+  }
+}
+
+/* チカチカ */
+@keyframes theme-flash {
+  0%,
+  70%,
+  100% {
+    filter: brightness(1);
+  }
+
+  75% {
+    filter: brightness(2.2);
+  }
+
+  80% {
+    filter: brightness(0.7);
+  }
+
+  85% {
+    filter: brightness(2);
+  }
+
+  90% {
+    filter: brightness(1);
+  }
 }
