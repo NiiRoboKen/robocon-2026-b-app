@@ -1,6 +1,6 @@
 .emergency-panel {
-  width: 280px;
-  padding: 20px;
+  width: 220px;
+  padding: 12px;
 
   box-sizing: border-box;
 
@@ -9,20 +9,19 @@
 
   text-align: center;
 
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
-
 
 /* =========================
    黄色い土台
    ========================= */
 
 .emergency-button {
+  animation: emergency-glow 1s infinite;
   position: relative;
 
-  width: 220px;
-  height: 220px;
+  width: 150px;
+  height: 150px;
 
   margin: 0 auto;
 
@@ -39,6 +38,29 @@
     0 15px 25px rgba(0, 0, 0, 0.4);
 }
 
+@keyframes emergency-glow {
+  0%,
+  70%,
+  100% {
+    box-shadow:
+      0 8px 0 #a88700,
+      0 15px 25px rgba(0, 0, 0, 0.4);
+  }
+
+  75% {
+    box-shadow:
+      0 8px 0 #a88700,
+      0 15px 25px rgba(0, 0, 0, 0.4),
+      0 0 50px rgba(255, 0, 0, 0.9);
+  }
+
+  85% {
+    box-shadow:
+      0 8px 0 #a88700,
+      0 15px 25px rgba(0, 0, 0, 0.4),
+      0 0 60px rgba(255, 0, 0, 1.5);
+  }
+}
 
 /* =========================
    しましま
@@ -46,14 +68,12 @@
 .emergency-stripes {
   position: relative;
 
-  width: 175px;
-  height: 175px;
+  width: 145px;
+  height: 145px;
 
-  border-radius: 50%;
+  border-radius: 22px;
 
-  background: repeating-linear-gradient(45deg,
-      #111 0 20px,
-      #ffd900 20px 40px);
+  background: repeating-linear-gradient(45deg, #111 0 20px, #ffd900 20px 40px);
 
   display: flex;
   align-items: center;
@@ -62,26 +82,24 @@
   perspective: 500px;
 }
 
-
 /* =========================
    赤いボタン
    ========================= */
 
 .emergency-button__red {
+  animation: emergency-warning 1.2s infinite;
   position: relative;
   z-index: 1;
 
-  width: 125px;
-  height: 125px;
+  width: 105px;
+  height: 105px;
 
   padding: 0;
 
   border-radius: 50%;
   border: 7px solid #a00000;
 
-  background: linear-gradient(145deg,
-      #ff3838,
-      #c90000);
+  background: linear-gradient(145deg, #ff3838, #c90000);
 
   color: white;
 
@@ -104,6 +122,29 @@
     box-shadow 0.08s ease;
 }
 
+@keyframes emergency-warning {
+  0%,
+  70%,
+  100% {
+    filter: brightness(1);
+  }
+
+  75% {
+    filter: brightness(1.5);
+  }
+
+  80% {
+    filter: brightness(0.85);
+  }
+
+  85% {
+    filter: brightness(1.7);
+  }
+
+  90% {
+    filter: brightness(1);
+  }
+}
 
 /* 押したとき */
 .emergency-button__red:active:not(:disabled) {
@@ -114,23 +155,111 @@
     inset 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.emergency-button__red.emergency-active {
+  animation: emergency-pressed 0.5s ease-out;
+}
 
+@keyframes emergency-pressed {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+
+    box-shadow:
+      0 10px 0 #710000,
+      inset 0 6px 10px rgba(255, 255, 255, 0.25),
+      0 8px 15px rgba(0, 0, 0, 0.4);
+  }
+
+  15% {
+    transform: scale(1.15);
+    filter: brightness(2.5);
+
+    box-shadow:
+      0 10px 0 #710000,
+      0 0 30px red,
+      0 0 70px red,
+      0 0 140px red,
+      0 0 220px rgba(255, 255, 255, 0.9);
+  }
+
+  35% {
+    transform: scale(1.05);
+    filter: brightness(3);
+
+    box-shadow:
+      0 10px 0 #710000,
+      0 0 30px #ff0000,
+      0 0 70px #ff0000,
+      0 0 120px #ffffff;
+  }
+
+  55% {
+    transform: scale(0.98);
+    filter: brightness(2);
+  }
+
+  100% {
+    transform: scale(10);
+    filter: brightness(10);
+
+    box-shadow:
+      0 10px 0 #710000,
+      inset 0 6px 10px rgba(255, 255, 255, 0.25),
+      0 8px 15px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@keyframes emergency-pressed {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  20% {
+    transform: scale(1.15);
+    filter: brightness(2.5);
+
+    box-shadow:
+      0 20px 0 #710000,
+      0 0 20px red,
+      0 0 50px red,
+      0 0 100px white;
+  }
+
+  45% {
+    transform: scale(1.3);
+    filter: brightness(3);
+  }
+
+  100% {
+    transform: scale(1.5);
+    filter: brightness(4.5);
+  }
+}
 /* カバーが閉じている間 */
 .emergency-button__red:disabled {
   cursor: not-allowed;
 }
 
+.emergency-button__red:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.emergency-button__red:focus-visible {
+  outline: 4px solid white;
+  outline-offset: 5px;
+}
 
 /* =========================
-   透明カバー
+  透明カバー
    ========================= */
 
 .emergency-cover {
   position: absolute;
   z-index: 2;
 
-  width: 155px;
-  height: 155px;
+  width: 130px;
+  height: 130px;
 
   left: 50%;
   top: 50%;
@@ -156,8 +285,7 @@
    */
   transform-origin: 50% 0%;
 
-  transition:
-    transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* =========================
@@ -168,12 +296,11 @@
   /*
    * 上端を支点にして手前から上へ開く
    */
-  transform:
-    translate(-50%, -50%) rotateX(65deg);
+  transform: translate(-50%, -50%) rotateX(75deg);
 
   opacity: 1;
 
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 /* =========================
@@ -202,7 +329,6 @@
   pointer-events: none;
 }
 
-
 /* =========================
    カバーの取っ手
    ========================= */
@@ -222,29 +348,51 @@
 
   background: #333;
 
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
-
 
 /* =========================
    下の表示
    ========================= */
 
 .emergency-label {
-  margin-top: 25px;
-
-  padding: 12px;
+  margin-top: 15px;
+  padding: 8px;
 
   border-radius: 10px;
 
   background: #e60000;
-
   color: white;
 
-  font-size: 22px;
+  font-size: 18px;
   font-weight: bold;
 
-  box-shadow:
-    0 4px 0 #8b0000;
+  box-shadow: 0 4px 0 #8b0000;
+
+  animation: emergency-label-warning 1s infinite;
+}
+
+@keyframes emergency-label-warning {
+  0%,
+  60%,
+  100% {
+    background: #e60000;
+    box-shadow:
+      0 4px 0 #8b0000,
+      0 0 0 rgba(255, 0, 0, 0);
+  }
+
+  70% {
+    background: #ff3030;
+    box-shadow:
+      0 4px 0 #8b0000,
+      0 0 15px rgba(255, 0, 0, 0.8);
+  }
+
+  80% {
+    background: #ff0000;
+    box-shadow:
+      0 4px 0 #8b0000,
+      0 0 25px rgba(255, 0, 0, 1);
+  }
 }
