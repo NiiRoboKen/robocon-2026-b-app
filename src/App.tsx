@@ -33,7 +33,8 @@ const ORIGIN_X = 1800;
 const ORIGIN_Y = 500;
 
 const App = () => {
-  const { connect, disconnect } = useWebSocket();
+  const { connect, disconnect, realtimeStatus, status, espConnecting } =
+    useWebSocket();
   const { mode } = useModeStore();
 
   const theme = mode as ThemeType;
@@ -185,10 +186,10 @@ const App = () => {
           >
             <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
-                x={displayCoord.x}
-                y={displayCoord.y}
-                theta={pose.theta}
-                connected={true}
+                x={realtimeStatus.x}
+                y={realtimeStatus.y}
+                theta={realtimeStatus.theta}
+                connected={status === "CONNECTING" && espConnecting}
               />
             </Box>
 

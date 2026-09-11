@@ -13,13 +13,13 @@ export type ToFStatus = {
 };
 
 class Setting {
-  fieldSize = { width: 5250, height: 10500 };
+  fieldSize = { width: 5400, height: 10500 };
   robotSize = { width: 1000, height: 1000 };
 
   get defaultRobotPosition() {
     return {
-      x: this.fieldSize.width / 2 - this.robotSize.width / 2,
-      y: this.fieldSize.height - this.robotSize.height,
+      x: 0,
+      y: 0,
       theta: 0,
     };
   }
