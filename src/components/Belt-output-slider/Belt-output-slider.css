@@ -1,0 +1,178 @@
+/* =========================
+   発射設定全体
+========================= */
+
+.shoot-setting {
+  position: relative;
+
+  padding: 10px 22px 14px;
+
+  border: 2px solid #ff3300;
+  border-radius: 10px;
+
+  background: #1b1b1b;
+
+  box-shadow:
+    0 0 5px #ff3300,
+    0 0 12px rgba(255, 50, 0, 0.7),
+    inset 0 0 12px rgba(255, 0, 0, 0.15);
+
+  animation: danger-panel 0.8s infinite alternate;
+}
+
+/* =========================
+   ラベル
+========================= */
+
+.shoot-setting__label {
+  color: #ff4b2b;
+
+  text-shadow:
+    0 0 4px #ff2200,
+    0 0 10px #ff0000;
+
+  animation: danger-text 0.45s infinite alternate;
+}
+
+.shoot-setting__time {
+  margin-top: 12px;
+}
+
+/* =========================
+   スライダー
+========================= */
+
+.shoot-slider {
+  filter: drop-shadow(0 0 3px #ff3300)
+    drop-shadow(0 0 8px rgba(255, 30, 0, 0.8));
+
+  animation: slider-glow 0.6s infinite alternate;
+}
+
+/* トラック */
+
+.shoot-slider [data-part="track"] {
+  background: #555;
+}
+
+/* 選択済み部分 */
+
+.shoot-slider [data-part="range"] {
+  background: linear-gradient(90deg, #ff6600, #ff0000, #ff6600);
+
+  background-size: 200% 100%;
+
+  animation: range-fire 0.4s linear infinite;
+}
+
+/* つまみ */
+
+.shoot-slider [data-part="thumb"] {
+  background: #ff2a00;
+
+  border: 3px solid #ffcc00;
+
+  box-shadow:
+    0 0 5px #fff,
+    0 0 10px #ff3300,
+    0 0 20px #ff0000;
+
+  animation: thumb-flash 0.5s infinite alternate;
+}
+
+/* =========================
+   全体の点滅
+========================= */
+
+@keyframes danger-panel {
+  0% {
+    border-color: #ff3300;
+
+    box-shadow:
+      0 0 4px #ff3300,
+      0 0 8px rgba(255, 30, 0, 0.5),
+      inset 0 0 8px rgba(255, 0, 0, 0.1);
+  }
+
+  100% {
+    border-color: #ffff00;
+
+    box-shadow:
+      0 0 8px #ff0000,
+      0 0 25px #ff3300,
+      0 0 45px rgba(255, 0, 0, 0.6),
+      inset 0 0 20px rgba(255, 0, 0, 0.3);
+  }
+}
+
+/* =========================
+   文字点滅
+========================= */
+
+@keyframes danger-text {
+  0% {
+    color: #ff3300;
+
+    text-shadow: 0 0 3px #ff0000;
+  }
+
+  100% {
+    color: #ffff00;
+
+    text-shadow:
+      0 0 5px #ff0000,
+      0 0 15px #ff3300,
+      0 0 25px #ff0000;
+  }
+}
+
+/* =========================
+   スライダー発光
+========================= */
+
+@keyframes slider-glow {
+  0% {
+    filter: drop-shadow(0 0 2px #ff3300);
+  }
+
+  100% {
+    filter: drop-shadow(0 0 6px #ff3300) drop-shadow(0 0 15px #ff0000);
+  }
+}
+
+/* =========================
+   赤い部分が流れる
+========================= */
+
+@keyframes range-fire {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* =========================
+   つまみ点滅
+========================= */
+
+@keyframes thumb-flash {
+  0% {
+    transform: scale(1);
+
+    box-shadow:
+      0 0 4px #fff,
+      0 0 8px #ff3300;
+  }
+
+  100% {
+    transform: scale(1.15);
+
+    box-shadow:
+      0 0 8px #fff,
+      0 0 15px #ff3300,
+      0 0 30px #ff0000;
+  }
+}
