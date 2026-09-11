@@ -1,13 +1,411 @@
-.Preset {
-  width: 33.5vw;
-  height: 11.55vh;
-  background-color: orangered;
-  color: #fff;
+@property --scan-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
-.RightDiv {
+
+.preset {
+  width: 33.5vw;
+  max-width: 100%;
+  box-sizing: border-box;
+
   position: relative;
-  border: 2px solid orangered; /* 枠の太さ・種類・色 */
-  border-radius: 4px; /* 枠の丸み */
-  margin: 0.9em 0.2em; /* 枠外の余白 */
-  padding: 0.1vw;
+  overflow: visible;
+
+  background: linear-gradient(145deg, #11151a, #202730);
+
+  border: 2px solid #2488ff !important;
+  border-radius: 16px !important;
+
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 10px rgba(36, 136, 255, 0.8),
+    0 0 25px rgba(36, 136, 255, 0.35),
+    0 12px 30px rgba(0, 0, 0, 0.55);
+
+  padding-bottom: 10px !important;
+
+  animation: preset-frame-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes preset-frame-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 4px rgba(255, 255, 255, 0.9),
+      0 0 10px rgba(36, 136, 255, 0.8),
+      0 0 25px rgba(36, 136, 255, 0.35),
+      0 12px 30px rgba(0, 0, 0, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 8px rgba(255, 255, 255, 1),
+      0 0 20px rgba(36, 136, 255, 1),
+      0 0 45px rgba(36, 136, 255, 0.6),
+      0 12px 30px rgba(0, 0, 0, 0.55);
+  }
+}
+
+.preset::before {
+  content: "";
+
+  position: absolute;
+  inset: -3px;
+
+  border-radius: 16px;
+  padding: 3px;
+
+  background: conic-gradient(
+    from var(--scan-angle),
+    transparent 0deg,
+    transparent 270deg,
+    rgba(36, 136, 255, 0.15) 300deg,
+    rgba(36, 136, 255, 0.6) 330deg,
+    rgba(120, 200, 255, 0.9) 348deg,
+    #ffffff 357deg,
+    #ffffff 360deg
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px #2488ff)
+    drop-shadow(0 0 20px #2488ff) drop-shadow(0 0 35px rgba(36, 136, 255, 0.6));
+
+  pointer-events: none;
+  z-index: 10;
+
+  animation: preset-border-glow 2.2s linear infinite;
+}
+
+.preset::after {
+  content: "";
+
+  position: absolute;
+  inset: -3px;
+
+  border-radius: 16px;
+  padding: 3px;
+
+  background: conic-gradient(
+    from var(--scan-angle),
+    transparent 0deg,
+    transparent 355deg,
+    #ffffff 358deg,
+    #ffffff 360deg
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  filter: drop-shadow(0 0 6px #ffffff) drop-shadow(0 0 16px #ffffff)
+    drop-shadow(0 0 28px #66bbff);
+
+  pointer-events: none;
+  z-index: 11;
+
+  animation: preset-border-glow 2.2s linear infinite;
+}
+
+@keyframes preset-border-glow {
+  from {
+    --scan-angle: 0deg;
+  }
+  to {
+    --scan-angle: 360deg;
+  }
+}
+/* スライダー*/
+
+.slider-section {
+  padding: 4px 8px;
+}
+
+.slider-label {
+  color: #e8f3ff;
+  letter-spacing: 0.05em;
+}
+
+.slider-unit {
+  margin-left: 8px;
+
+  color: #42a5ff;
+
+  font-size: 16px;
+
+  text-shadow:
+    0 0 6px #2488ff,
+    0 0 12px rgba(36, 136, 255, 0.7);
+}
+
+/* Chakra Slider */
+.preset [data-part="track"] {
+  background: #252b33;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.preset [data-part="range"] {
+  background: linear-gradient(90deg, #006eff, #00c8ff);
+
+  box-shadow:
+    0 0 7px #008cff,
+    0 0 15px rgba(0, 140, 255, 0.7);
+}
+
+.preset [data-part="thumb"] {
+  background: #dff6ff;
+  border: 2px solid #008cff;
+
+  box-shadow:
+    0 0 6px #008cff,
+    0 0 15px #008cff,
+    0 0 25px rgba(0, 140, 255, 0.5);
+}
+
+/* =========================
+   操作パネル
+========================= */
+
+/* =========================
+   ボタン共通
+========================= */
+
+.controller-button {
+  position: relative;
+
+  height: 55px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 10px !important;
+
+  color: white !important;
+
+  font-size: 13px !important;
+  font-weight: 900 !important;
+
+  letter-spacing: 0.05em;
+
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 2px;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.08s ease,
+    filter 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ボタンに流れる光 */
+.controller-button::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 60%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+
+  transition: left 0.35s ease;
+}
+
+.controller-button:hover::before {
+  left: 150%;
+}
+
+/* ホバー */
+.controller-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.3);
+}
+
+/* 押している間 */
+.controller-button:active {
+  transform: translateY(3px) scale(0.94);
+  filter: brightness(1.6);
+}
+
+/* =========================
+   移動ボタン
+========================= */
+
+.move-button {
+  background: linear-gradient(145deg, #1677ff, #0044aa) !important;
+
+  box-shadow:
+    0 4px 0 #002d70,
+    0 0 8px rgba(30, 144, 255, 0.5);
+}
+
+.move-button:hover {
+  box-shadow:
+    0 4px 0 #002d70,
+    0 0 15px #1685ff,
+    0 0 30px rgba(30, 144, 255, 0.65);
+}
+
+/* 矢印 */
+.arrow {
+  font-size: 18px;
+  line-height: 16px;
+
+  text-shadow:
+    0 0 5px white,
+    0 0 10px #66bbff;
+}
+
+/* =========================
+   回転ボタン
+========================= */
+
+.rotate-button {
+  background: linear-gradient(145deg, #ffc928, #c47a00) !important;
+
+  box-shadow:
+    0 4px 0 #774800,
+    0 0 8px rgba(255, 190, 0, 0.5);
+}
+
+.rotate-button:hover {
+  box-shadow:
+    0 4px 0 #774800,
+    0 0 15px #ffc400,
+    0 0 30px rgba(255, 190, 0, 0.7);
+}
+
+.rotate-button:first-letter {
+  font-size: 24px;
+}
+
+/* =========================
+   停止ボタン
+========================= */
+
+.stop-button {
+  background: linear-gradient(145deg, #ff3838, #a80000) !important;
+
+  box-shadow:
+    0 4px 0 #600000,
+    0 0 10px rgba(255, 0, 0, 0.65);
+
+  animation: stop-warning 1.5s infinite;
+}
+
+.stop-button:hover {
+  box-shadow:
+    0 4px 0 #600000,
+    0 0 20px red,
+    0 0 40px rgba(255, 0, 0, 0.6);
+}
+
+@keyframes stop-warning {
+  0%,
+  70%,
+  100% {
+    filter: brightness(1);
+  }
+
+  75% {
+    filter: brightness(1.35);
+  }
+
+  80% {
+    filter: brightness(0.85);
+  }
+
+  85% {
+    filter: brightness(1.5);
+
+    box-shadow:
+      0 4px 0 #600000,
+      0 0 15px red,
+      0 0 30px red;
+  }
+}
+
+/* =========================
+   クリック時の発光
+========================= */
+
+.button-flash {
+  animation: controller-button-flash 0.25s ease-out !important;
+}
+
+@keyframes controller-button-flash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  25% {
+    transform: scale(0.9);
+    filter: brightness(2);
+  }
+
+  50% {
+    transform: scale(1.05);
+    filter: brightness(2.5);
+
+    box-shadow:
+      0 0 20px white,
+      0 0 40px currentColor,
+      0 0 70px currentColor;
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* 停止だけさらに派手に */
+.stop-flash {
+  animation: stop-button-flash 0.25s ease-out !important;
+}
+
+@keyframes stop-button-flash {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(0.88);
+    filter: brightness(1.5);
+  }
+
+  55% {
+    transform: scale(1.08);
+    filter: brightness(2.5);
+
+    box-shadow:
+      0 0 20px red,
+      0 0 50px red,
+      0 0 90px white;
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
