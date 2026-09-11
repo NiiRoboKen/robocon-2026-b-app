@@ -33,7 +33,8 @@ const ORIGIN_X = 1800;
 const ORIGIN_Y = 500;
 
 const App = () => {
-  const { connect, disconnect, realtimeStatus } = useWebSocket();
+  const { connect, disconnect, realtimeStatus, status, espConnecting } =
+    useWebSocket();
   const { mode } = useModeStore();
 
   const theme = mode as ThemeType;
@@ -188,7 +189,7 @@ const App = () => {
                 x={realtimeStatus.x}
                 y={realtimeStatus.y}
                 theta={realtimeStatus.theta}
-                connected={true}
+                connected={status === "CONNECTING" && espConnecting}
               />
             </Box>
 
