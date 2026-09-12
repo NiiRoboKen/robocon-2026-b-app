@@ -12,6 +12,13 @@ export const LaunchButton = () => {
 
   const handleLaunch = () => {
     // 発射コマンド
+    const se = new Audio("/sounds/launch.mp3");
+    se.volume = 0.8;
+    se.currentTime = 0;
+    se.play().catch((error) => {
+      console.error("SEの再生に失敗しました:", error);
+    });
+
     sendMessage({
       command: "shoot",
       pwm: shootPwm,
