@@ -9,13 +9,20 @@ type ExtendedCommands =
   | { command: "connection_success" }
   | { command: "connection_failed" };
 
+export type NavigateCommand = {
+  command: "navigate";
+  x: number;
+  y: number;
+  degree: number;
+};
+
 interface WebSocketState {
   realtimeStatus: Status;
   espConnecting: boolean;
   status: "ERROR" | "CONNECTING" | "CLOSE";
   socket: ReconnectingWebSocket | null;
   tofStatus: ToFStatus;
-  sendMessage: (data: Commands) => void;
+  sendMessage: (data: Commands | NavigateCommand) => void;
   connect: () => void;
   disconnect: () => void;
 }
@@ -37,7 +44,7 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
   connect: () => {
     if (get().socket) return;
 
-    const socket = new ReconnectingWebSocket("ws://192.168.151.188:3000/");
+    const socket = new ReconnectingWebSocket("ws://192.168.11.222:3000/");
 
     socket.onopen = () => {
       console.log("WebSocket connected");
@@ -61,8 +68,8 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
           case "current_location":
             set({
               realtimeStatus: {
-                x: receivedData.x,
-                y: receivedData.y,
+                x: receivedData.y,
+                y: receivedData.x,
                 theta: receivedData.degree,
               },
             });
@@ -102,7 +109,7 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
     }
   },
 
-  sendMessage: (data: Commands) => {
+  sendMessage: (data: Commands | NavigateCommand) => {
     const socket = get().socket;
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(data));

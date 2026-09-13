@@ -22,15 +22,8 @@ import { useModeStore } from "./hooks/useController.ts";
 
 type ThemeType = "blue" | "red";
 
-type Pose = {
-  x: number;
-  y: number;
-  theta: number;
-};
-
-const FIELD_W = 6000;
-const ORIGIN_X = 1800;
-const ORIGIN_Y = 500;
+const ORIGIN_X = 3900 - 200;
+const ORIGIN_Y = 500 + 50;
 
 const App = () => {
   const { connect, disconnect, realtimeStatus, status, espConnecting } =
@@ -39,24 +32,6 @@ const App = () => {
 
   const theme = mode as ThemeType;
 
-  const initialPose = useMemo<Pose>(() => {
-    if (theme === "blue") {
-      return {
-        x: ORIGIN_X,
-        y: ORIGIN_Y,
-        theta: 0,
-      };
-    }
-
-    return {
-      x: FIELD_W - ORIGIN_X,
-      y: ORIGIN_Y,
-      theta: 0,
-    };
-  }, [theme]);
-
-  const [pose, setPose] = useState<Pose>(initialPose);
-
   const fieldRef = useRef<HTMLDivElement>(null);
 
   const [fieldSize, setFieldSize] = useState({
@@ -64,9 +39,41 @@ const App = () => {
     h: 1,
   });
 
+  const absolutePose = useMemo(() => {
+    return {
+      x: ORIGIN_X + realtimeStatus.x,
+      y: ORIGIN_Y + realtimeStatus.y,
+      theta: realtimeStatus.theta,
+    };
+  }, [realtimeStatus]);
+
   useEffect(() => {
-    setPose(initialPose);
-  }, [initialPose]);
+    connect();
+    return () => {
+      disconnect();
+    };
+  }, [connect, disconnect]);
+
+  useEffect(() => {
+    const el = fieldRef.current;
+    if (!el) return;
+
+    const updateSize = () => {
+      const rect = el.getBoundingClientRect();
+      setFieldSize({
+        w: rect.width,
+        h: rect.height,
+      });
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     connect();
@@ -75,45 +82,6 @@ const App = () => {
       disconnect();
     };
   }, [connect, disconnect]);
-
-  useEffect(() => {
-    const el = fieldRef.current;
-
-    if (!el) return;
-
-    const updateSize = () => {
-      const rect = el.getBoundingClientRect();
-
-      setFieldSize({
-        w: rect.width,
-        h: rect.height,
-      });
-    };
-
-    updateSize();
-
-    const observer = new ResizeObserver(updateSize);
-
-    observer.observe(el);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const displayCoord = useMemo(() => {
-    if (theme === "blue") {
-      return {
-        x: pose.x - ORIGIN_X,
-        y: pose.y - ORIGIN_Y,
-      };
-    }
-
-    return {
-      x: FIELD_W - pose.x - ORIGIN_X,
-      y: pose.y - ORIGIN_Y,
-    };
-  }, [pose, theme]);
 
   return (
     <ChakraProvider value={defaultSystem}>
@@ -159,15 +127,10 @@ const App = () => {
               <SetLocation />
 
               <Robot
-                x={pose.x}
-                y={pose.y}
-                theta={pose.theta}
+                x={absolutePose.x}
+                y={absolutePose.y}
+                theta={absolutePose.theta}
                 theme={theme}
-                imageSrc={
-                  theme === "blue"
-                    ? "/fieldBlueImage.png"
-                    : "/fieldRedImage.png"
-                }
               />
             </Box>
           </VStack>

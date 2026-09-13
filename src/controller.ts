@@ -13,7 +13,7 @@ export type ToFStatus = {
 };
 
 class Setting {
-  fieldSize = { width: 5400, height: 10500 };
+  fieldSize = { width: 5700, height: 10500 };
   robotSize = { width: 1000, height: 1000 };
 
   get defaultRobotPosition() {
