@@ -68,7 +68,7 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
           case "current_location":
             set({
               realtimeStatus: {
-                x: receivedData.y,
+                x: -receivedData.y,
                 y: receivedData.x,
                 theta: receivedData.degree,
               },

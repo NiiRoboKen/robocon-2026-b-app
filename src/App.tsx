@@ -149,9 +149,9 @@ const App = () => {
           >
             <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
-                x={realtimeStatus.x}
-                y={realtimeStatus.y}
-                theta={realtimeStatus.theta}
+                x={absolutePose.x}
+                y={absolutePose.y}
+                theta={absolutePose.theta}
                 connected={status === "CONNECTING" && espConnecting}
               />
             </Box>
