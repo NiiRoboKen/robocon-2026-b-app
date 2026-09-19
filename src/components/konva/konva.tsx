@@ -90,6 +90,7 @@ const SetLocation = () => {
       x: Math.round(realX),
       y: Math.round(realY),
       degree: Math.round(targetDegree),
+      theme: mode,
     });
 
     setStartPos(null);
