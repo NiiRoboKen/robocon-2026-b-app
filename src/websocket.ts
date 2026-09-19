@@ -14,7 +14,7 @@ export type NavigateCommand = {
   x: number;
   y: number;
   degree: number;
-  theme? "blue"|"red";
+  theme?: "blue" | "red";
 };
 
 interface WebSocketState {
