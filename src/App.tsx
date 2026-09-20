@@ -19,6 +19,8 @@ import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButto
 import AllStopButton from "./components/stop-button/StopButton.tsx";
 import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
 import { useModeStore } from "./hooks/useController.ts";
+import ResetButton from "./components/Reset-button/ResetButton.tsx";
+import { setting } from "./controller.ts";
 
 type ThemeType = "blue" | "red";
 
@@ -82,6 +84,34 @@ const App = () => {
       disconnect();
     };
   }, [connect, disconnect]);
+  type ThemeType = "blue" | "red";
+
+  type Pose = {
+    x: number;
+    y: number;
+    theta: number;
+  };
+  const getInitialPose = (): Pose => {
+    if (theme === "red") {
+      return {
+        x: 1800,
+        y: 500,
+        theta: 0,
+      };
+    }
+
+    return {
+      x: setting.fieldSize.width - 1800,
+      y: 500,
+      theta: 0,
+    };
+  };
+
+  const [pose, setPose] = useState<Pose>(getInitialPose);
+
+  const handleReset = () => {
+    setPose(getInitialPose());
+  };
 
   return (
     <ChakraProvider value={defaultSystem}>
@@ -158,6 +188,7 @@ const App = () => {
 
             <AllStopButton />
             <ChangeThemeButton />
+            <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
             <LaunchButton />
             <Preset />
