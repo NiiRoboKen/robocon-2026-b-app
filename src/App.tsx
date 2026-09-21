@@ -77,14 +77,6 @@ const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    connect();
-
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect]);
-
   type ThemeType = "blue" | "red";
 
   type Pose = {
