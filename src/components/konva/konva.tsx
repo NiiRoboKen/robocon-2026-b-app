@@ -18,6 +18,7 @@ const NO_ENTRY_ZONES = [
   { minX: 4460, maxX: 4740, minY: 5660, maxY: 5940 },
   { minX: 3820, maxX: 4200, minY: 7430, maxY: 7800 },
   { minX: 1490, maxX: 2000, minY: 8290, maxY: 9000 },
+  { minX: 4200, maxX: 4600, minY: 200, maxY: 850 },
 ];
 
 const SetLocation = () => {
