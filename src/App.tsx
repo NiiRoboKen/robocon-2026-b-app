@@ -84,6 +84,7 @@ const App = () => {
       disconnect();
     };
   }, [connect, disconnect]);
+
   type ThemeType = "blue" | "red";
 
   type Pose = {

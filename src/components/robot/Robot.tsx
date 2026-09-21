@@ -46,7 +46,6 @@ export const Robot = ({ x, y, theta = 0, theme }: RobotProps) => {
         transform: `translate(-50%, -50%) rotate(${-displayTheta}deg)`,
         transformOrigin: "center center",
         background: "#00ff7f",
-        border: "2px solid white",
         boxSizing: "border-box",
         pointerEvents: "none",
         userSelect: "none",
