@@ -1,9 +1,9 @@
-import { Button } from "../Button/Button";
+import { Button } from "@chakra-ui/react";
 import { useWebSocket } from "../../websocket";
 import { useController } from "../../hooks/useController";
 export const LaunchButton = () => {
-  const {sendMessage} = useWebSocket();
-  const {shootPwm,shootTime} = useController();
+  const { sendMessage } = useWebSocket();
+  const { shootPwm, shootTime } = useController();
 
   const handleLaunch = () => {
     sendMessage({
@@ -15,7 +15,9 @@ export const LaunchButton = () => {
 
   return (
     <div>
-      <Button onClick={handleLaunch}>発射</Button>
+      <Button onClick={handleLaunch} bg="green.600">
+        発射
+      </Button>
     </div>
   );
 };

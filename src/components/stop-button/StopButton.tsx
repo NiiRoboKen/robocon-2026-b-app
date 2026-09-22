@@ -10,6 +10,9 @@ const AllStopButton = () => {
       className="StopButton"
       onClick={() => sendMessage({ command: "emergency_stop" })}
       rounded="3xl"
+      _active={{
+        transform: "translateY(3px)",
+      }}
     >
       緊急停止
     </Button>

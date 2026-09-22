@@ -3,7 +3,7 @@ import { Button } from "@chakra-ui/react";
 export const MoveAndLaunchButton = () => {
   return (
     <div>
-      <Button></Button>
+      <Button bg="orange.400">移動&発射</Button>
     </div>
   );
 };

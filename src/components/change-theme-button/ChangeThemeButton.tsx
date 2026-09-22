@@ -6,7 +6,14 @@ const ChangeThemeButton = () => {
   const { toggleMode } = useModeStore.getState();
 
   return (
-    <Button className="change-theme-button" onClick={toggleMode} rounded="3xl">
+    <Button
+      className="change-theme-button"
+      onClick={toggleMode}
+      rounded="3xl"
+      _active={{
+        transform: "translateY(3px)",
+      }}
+    >
       Change Thema
     </Button>
   );

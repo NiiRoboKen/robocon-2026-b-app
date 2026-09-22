@@ -21,6 +21,7 @@ import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
 import { useModeStore } from "./hooks/useController.ts";
 import ResetButton from "./components/Reset-button/ResetButton.tsx";
 import { setting } from "./controller.ts";
+import { MoveAndLaunchButton } from "./components/Move-and-launch-button/MoveAndLaunchButton.tsx";
 
 type ThemeType = "blue" | "red";
 
@@ -191,7 +192,10 @@ const App = () => {
             <ChangeThemeButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
-            <LaunchButton />
+            <HStack>
+              <LaunchButton />
+              <MoveAndLaunchButton />
+            </HStack>
             <Preset />
           </VStack>
         </HStack>

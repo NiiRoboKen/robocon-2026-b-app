@@ -74,6 +74,7 @@ export const Preset = () => {
           max={1000}
           step={10}
           onValueChange={(e) => setDistance(e.value[0])}
+          colorPalette="yellow"
         >
           <Slider.Control>
             <Slider.Track>
@@ -103,6 +104,7 @@ export const Preset = () => {
           max={180}
           step={3}
           onValueChange={(e) => setAngleStep(e.value[0])}
+          colorPalette="yellow"
         >
           <Slider.Control>
             <Slider.Track>
@@ -122,7 +124,7 @@ export const Preset = () => {
         </Slider.Root>
       </Box>
 
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box display="flex" justifyContent="center" alignItems="center" mt={8}>
         <Grid templateColumns="repeat(3, 1fr)" gap={2} w="300px">
           <GridItem colStart={2}>
             <Button
