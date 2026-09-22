@@ -5,6 +5,7 @@ export type Commands =
   | Pong
   | EmergencyStop
   | CurrentLocation
+  | NavigateAbsolute
   | SetLocation
   | ToFSenser
   | Shoot;
@@ -48,6 +49,13 @@ export type ToFSenser = {
   command: "tof_senser";
   distance: number;
   ToFdegree: number;
+};
+
+export type NavigateAbsolute = {
+  command: "navigate_absolute";
+  x: number;
+  y: number;
+  degree: number; // 最終的な絶対目標角度（度）
 };
 
 export type Shoot = {
