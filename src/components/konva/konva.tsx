@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Stage, Layer, Image, Line, Arrow, Rect } from "react-konva";
+import { useState, useRef, useEffect } from "react";
+import { Stage, Layer, Image, Line, Arrow, Rect, Circle } from "react-konva";
 import useImage from "use-image";
 import Konva from "konva";
 import { useModeStore } from "../../hooks/useController";
@@ -8,6 +8,9 @@ import { useWebSocket } from "../../websocket";
 
 const REAL_FIELD_W = setting.fieldSize.width;
 const REAL_FIELD_H = setting.fieldSize.height;
+
+const ARROW_FIXED_LENGTH = 60;
+const DISPLAY_DURATION_MS = 1500;
 
 const NO_ENTRY_ZONES = [
   { minX: 0, maxX: 450, minY: 0, maxY: 690 },
@@ -19,6 +22,16 @@ const NO_ENTRY_ZONES = [
   { minX: 3820, maxX: 4200, minY: 7430, maxY: 7800 },
   { minX: 1490, maxX: 2000, minY: 8290, maxY: 9000 },
   { minX: 4200, maxX: 4600, minY: 200, maxY: 850 },
+  { minX: 5120, maxX: 5700, minY: 0, maxY: 10500 },
+];
+
+const CIRCLE_OBSTACLES = [
+  {
+    // フィールド右端(REAL_FIELD_W)からさらに右へ2800の位置
+    centerX: REAL_FIELD_W + 2800,
+    centerY: 5700 + 50,
+    radius: 3500,
+  },
 ];
 
 const SetLocation = () => {
@@ -34,10 +47,24 @@ const SetLocation = () => {
   const [currentPos, setCurrentPos] = useState<{ x: number; y: number } | null>(
     null,
   );
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handlePointerDown = (
     e: Konva.KonvaEventObject<PointerEvent | MouseEvent | TouchEvent>,
   ) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
     const stage = e.target.getStage();
     if (!stage) return;
 
@@ -51,7 +78,7 @@ const SetLocation = () => {
   const handlePointerMove = (
     e: Konva.KonvaEventObject<PointerEvent | MouseEvent | TouchEvent>,
   ) => {
-    if (!startPos) return;
+    if (!startPos || timeoutRef.current) return;
 
     const stage = e.target.getStage();
     if (!stage) return;
@@ -94,8 +121,26 @@ const SetLocation = () => {
       theme: mode,
     });
 
-    setStartPos(null);
-    setCurrentPos(null);
+    timeoutRef.current = setTimeout(() => {
+      setStartPos(null);
+      setCurrentPos(null);
+    }, DISPLAY_DURATION_MS);
+  };
+  const getFixedArrowPoints = () => {
+    if (!startPos || !currentPos) return [];
+
+    const dx = currentPos.x - startPos.x;
+    const dy = currentPos.y - startPos.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (distance < 5) {
+      return [startPos.x, startPos.y, startPos.x, startPos.y];
+    }
+
+    const endX = startPos.x + (dx / distance) * ARROW_FIXED_LENGTH;
+    const endY = startPos.y + (dy / distance) * ARROW_FIXED_LENGTH;
+
+    return [startPos.x, startPos.y, endX, endY];
   };
 
   return (
@@ -132,8 +177,31 @@ const SetLocation = () => {
               y={screenY}
               width={w * toScreenScaleX}
               height={h * toScreenScaleY}
-              fill="rgba(52, 49, 34, 0.4)" // 半透明の赤色
+              fill="rgba(61, 61, 61, 0.4)" // 半透明の赤色
               listening={false} // クリックイベントをブロックしない設定
+            /> // Y座標の指定がないため仮で縦中央に配置。必要に応じて 0 などに変更してください。
+          );
+        })}
+
+        {/* 線のみの円を描画 */}
+        {CIRCLE_OBSTACLES.map((obstacle, index) => {
+          let x = obstacle.centerX;
+          if (mode === "red") {
+            // 赤陣地モードの場合は中心座標も反転する（左側から入り込むようになる）
+            x = REAL_FIELD_W - obstacle.centerX;
+          }
+          const screenY = (REAL_FIELD_H - obstacle.centerY) * toScreenScaleY;
+          const screenRadius = obstacle.radius * toScreenScaleX;
+
+          return (
+            <Circle
+              key={`circle-${index}`}
+              x={x * toScreenScaleX}
+              y={screenY}
+              radius={screenRadius}
+              stroke="rgba(52, 49, 34, 0.8)" // 線の色（禁止エリアに合わせて少し濃くしています）
+              strokeWidth={3} // 線の太さ
+              listening={false}
             />
           );
         })}
@@ -158,7 +226,7 @@ const SetLocation = () => {
 
         {startPos && currentPos && (
           <Arrow
-            points={[startPos.x, startPos.y, currentPos.x, currentPos.y]}
+            points={getFixedArrowPoints()}
             stroke="#FFFF00"
             fill="#FFFF00"
             strokeWidth={4}
