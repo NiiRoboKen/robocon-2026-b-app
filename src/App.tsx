@@ -24,8 +24,8 @@ import { setting } from "./controller.ts";
 
 type ThemeType = "blue" | "red";
 
-const ORIGIN_X = 3900 - 200;
-const ORIGIN_Y = 500 + 50;
+const ORIGIN_X = 3900;
+const ORIGIN_Y = 500;
 
 const App = () => {
   const { connect, disconnect, realtimeStatus, status, espConnecting } =
@@ -150,8 +150,8 @@ const App = () => {
               <SetLocation />
 
               <Robot
-                x={absolutePose.x}
-                y={absolutePose.y}
+                x={absolutePose.x - 200} //表示用補正
+                y={absolutePose.y + 50}
                 theta={absolutePose.theta}
                 theme={theme}
               />
@@ -172,7 +172,7 @@ const App = () => {
           >
             <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
-                x={absolutePose.x}
+                x={absolutePose.x} //実際の座標
                 y={absolutePose.y}
                 theta={absolutePose.theta}
                 connected={status === "CONNECTING" && espConnecting}

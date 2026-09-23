@@ -6,11 +6,13 @@ import { useModeStore } from "../../hooks/useController";
 import { ModeTheme, setting } from "../../controller";
 import { useWebSocket } from "../../websocket";
 
+// 実フィールドの物理サイズ (mm)
 const REAL_FIELD_W = setting.fieldSize.width;
 const REAL_FIELD_H = setting.fieldSize.height;
 
-const ARROW_FIXED_LENGTH = 60;
-const DISPLAY_DURATION_MS = 1500;
+// UI描画用定数
+const ARROW_FIXED_LENGTH = 60; // 矢印の固定長
+const DISPLAY_DURATION_MS = 1500; // 矢印を表示し続ける時間
 
 const NO_ENTRY_ZONES = [
   { minX: 0, maxX: 450, minY: 0, maxY: 690 },
@@ -33,14 +35,14 @@ const CIRCLE_OBSTACLES = [
     radius: 3500,
   },
 ];
-
+// 旗から3500の位置の線 (物理座標)
 const SetLocation = () => {
   const { mode } = useModeStore();
   const colorTheme = ModeTheme[mode];
   const [fieldImage] = useImage(colorTheme.fieldImageSrc);
 
   const { sendMessage } = useWebSocket();
-
+  // 画面上のドラッグ開始・現在座標
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(
     null,
   );
@@ -48,7 +50,7 @@ const SetLocation = () => {
     null,
   );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  //タイマー初期化
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -88,9 +90,11 @@ const SetLocation = () => {
       setCurrentPos(pos);
     }
   };
+  // スクリーン座標と物理座標の変換
   const toRealScaleX = REAL_FIELD_W / setting.fieldSizeScale.width;
   const toRealScaleY = REAL_FIELD_H / setting.fieldSizeScale.height;
-
+  // スクリーン座標とフィールドの物理座標変換
+  // Y軸は画面（下向き正）とフィールド（上向き正）で反転しているため補正
   const toScreenScaleX = setting.fieldSizeScale.width / REAL_FIELD_W;
   const toScreenScaleY = setting.fieldSizeScale.height / REAL_FIELD_H;
 
@@ -101,14 +105,16 @@ const SetLocation = () => {
     const realY = REAL_FIELD_H - startPos.y * toRealScaleY;
     let targetDegree = 0;
 
+    // ドラッグ時ベクトル計算
     let dx = currentPos.x - startPos.x;
     const dy = -(currentPos.y - startPos.y);
 
+    // 赤陣地モードの場合はX座標と向きを反転して対称にする
     if (mode === "red") {
       realX = REAL_FIELD_W - realX;
       dx = -dx;
     }
-
+    // 誤操作防止用（5px以上ドラッグした場合のみ角度を計算）
     if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
       targetDegree = Math.atan2(dy, dx) * (180 / Math.PI);
     }
@@ -120,19 +126,21 @@ const SetLocation = () => {
       degree: Math.round(targetDegree),
       theme: mode,
     });
-
+    // 送信後、一定時間UI上に指示内容を残してから消去する
     timeoutRef.current = setTimeout(() => {
       setStartPos(null);
       setCurrentPos(null);
     }, DISPLAY_DURATION_MS);
   };
+
+  // 描画用 固定長矢印座標
   const getFixedArrowPoints = () => {
     if (!startPos || !currentPos) return [];
 
     const dx = currentPos.x - startPos.x;
     const dy = currentPos.y - startPos.y;
     const distance = Math.hypot(dx, dy);
-
+    // ドラッグ距離が短い場合は点
     if (distance < 5) {
       return [startPos.x, startPos.y, startPos.x, startPos.y];
     }
@@ -165,7 +173,7 @@ const SetLocation = () => {
           const w = zone.maxX - zone.minX;
           const h = zone.maxY - zone.minY;
 
-          // 赤陣地の場合はX座標を反転 (右端の座標を基準にする)
+          // 赤陣地の場合はX座標を反転 (右端の座標基準)
           if (mode === "red") {
             x = REAL_FIELD_W - zone.maxX;
           }
@@ -179,7 +187,7 @@ const SetLocation = () => {
               height={h * toScreenScaleY}
               fill="rgba(61, 61, 61, 0.4)" // 半透明の赤色
               listening={false} // クリックイベントをブロックしない設定
-            /> // Y座標の指定がないため仮で縦中央に配置。必要に応じて 0 などに変更してください。
+            />
           );
         })}
 
@@ -187,7 +195,7 @@ const SetLocation = () => {
         {CIRCLE_OBSTACLES.map((obstacle, index) => {
           let x = obstacle.centerX;
           if (mode === "red") {
-            // 赤陣地モードの場合は中心座標も反転する（左側から入り込むようになる）
+            // 赤陣地モードの場合中心座標も反転（左側）
             x = REAL_FIELD_W - obstacle.centerX;
           }
           const screenY = (REAL_FIELD_H - obstacle.centerY) * toScreenScaleY;
@@ -199,7 +207,7 @@ const SetLocation = () => {
               x={x * toScreenScaleX}
               y={screenY}
               radius={screenRadius}
-              stroke="rgba(52, 49, 34, 0.8)" // 線の色（禁止エリアに合わせて少し濃くしています）
+              stroke="rgba(52, 49, 34, 0.8)" // 線の色
               strokeWidth={3} // 線の太さ
               listening={false}
             />
