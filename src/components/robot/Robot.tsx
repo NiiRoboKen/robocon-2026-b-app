@@ -28,7 +28,7 @@ export const Robot = ({ x, y, theta = 0, theme }: RobotProps) => {
   // 画面の中央を軸にX座標と角度を左右反転
   if (theme === "red") {
     fieldX = FIELD_WIDTH_MM - fieldX;
-    displayTheta = 180 - theta;
+    displayTheta = 180 - theta; //Todo 正面みて変更 displayTheta = -theta;に
   }
   // 物理座標(mm)からスクリーン座標(px)への変換
   const px = (fieldX / FIELD_WIDTH_MM) * displayWidth;
