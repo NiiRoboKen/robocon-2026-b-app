@@ -42,10 +42,14 @@ const App = () => {
   });
 
   const absolutePose = useMemo(() => {
+    //赤モード時 Xの移動と回転を反転
+    const displayX = theme === "red" ? -realtimeStatus.x : realtimeStatus.x;
+    const displayTheta =
+      theme === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
     return {
-      x: ORIGIN_X + realtimeStatus.x,
+      x: ORIGIN_X + displayX,
       y: ORIGIN_Y + realtimeStatus.y,
-      theta: realtimeStatus.theta,
+      theta: displayTheta,
     };
   }, [realtimeStatus]);
 
