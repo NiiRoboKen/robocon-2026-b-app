@@ -1,5 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { Stage, Layer, Image, Line, Arrow, Rect, Circle } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Image,
+  Line,
+  Arrow,
+  Rect,
+  Circle,
+  RegularPolygon,
+} from "react-konva";
 import useImage from "use-image";
 import Konva from "konva";
 import { useModeStore } from "../../hooks/useController";
@@ -116,7 +125,7 @@ const SetLocation = () => {
     }
     // 誤操作防止用（5px以上ドラッグした場合のみ角度を計算）
     if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-      targetDegree = Math.atan2(dy, dx) * (180 / Math.PI);
+      targetDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
     }
 
     sendMessage({
@@ -140,9 +149,9 @@ const SetLocation = () => {
     const dx = currentPos.x - startPos.x;
     const dy = currentPos.y - startPos.y;
     const distance = Math.hypot(dx, dy);
-    // ドラッグ距離が短い場合は点
+    // ドラッグ距離が短い場合
     if (distance < 5) {
-      return [startPos.x, startPos.y, startPos.x, startPos.y];
+      return [];
     }
 
     const endX = startPos.x + (dx / distance) * ARROW_FIXED_LENGTH;
@@ -150,12 +159,6 @@ const SetLocation = () => {
 
     return [startPos.x, startPos.y, endX, endY];
   };
-
-  // ドラッグ距離を計算して判定
-  const isDragging =
-    startPos &&
-    currentPos &&
-    Math.hypot(currentPos.x - startPos.x, currentPos.y - startPos.y) >= 5;
 
   return (
     <Stage
@@ -238,28 +241,43 @@ const SetLocation = () => {
           closed
         />
 
-        {/* 距離に応じて矢印か円を描画 */}
+        {/* 距離に応じて三角形 または 矢印を描画 */}
         {startPos &&
           currentPos &&
-          (isDragging ? (
-            <Arrow
-              points={getFixedArrowPoints()}
-              stroke="#FFFF00"
-              fill="#FFFF00"
-              strokeWidth={4}
-              pointerLength={10}
-              pointerWidth={10}
-              opacity={0.8}
-            />
-          ) : (
-            <Circle
-              x={startPos.x}
-              y={startPos.y}
-              radius={6}
-              fill="#FFFF00"
-              opacity={0.8}
-            />
-          ))}
+          (() => {
+            const distance = Math.hypot(
+              currentPos.x - startPos.x,
+              currentPos.y - startPos.y,
+            );
+
+            if (distance < 5) {
+              // タップ時は上向き（0度）の三角形のみを表示
+              return (
+                <RegularPolygon
+                  x={startPos.x}
+                  y={startPos.y}
+                  sides={3}
+                  radius={8} // 三角形の大きさ
+                  fill="#FFFF00"
+                  opacity={0.8}
+                  // ※ Konvaの RegularPolygon(sides={3}) はデフォルトで真上を向きます
+                />
+              );
+            }
+
+            // ドラッグ時はこれまで通りの棒付き矢印
+            return (
+              <Arrow
+                points={getFixedArrowPoints()}
+                stroke="#FFFF00"
+                fill="#FFFF00"
+                strokeWidth={4}
+                pointerLength={10}
+                pointerWidth={10}
+                opacity={0.8}
+              />
+            );
+          })()}
       </Layer>
     </Stage>
   );
