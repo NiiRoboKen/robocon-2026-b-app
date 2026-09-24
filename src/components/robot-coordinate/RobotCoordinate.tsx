@@ -28,6 +28,7 @@ export const RobotCoordinate = ({
           gap: 16,
           alignItems: "center",
           flexWrap: "wrap",
+          color: "#000000",
         }}
       >
         <span>x: {Math.round(x)}</span>
