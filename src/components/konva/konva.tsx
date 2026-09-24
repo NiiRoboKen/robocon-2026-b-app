@@ -151,6 +151,12 @@ const SetLocation = () => {
     return [startPos.x, startPos.y, endX, endY];
   };
 
+  // ドラッグ距離を計算して判定
+  const isDragging =
+    startPos &&
+    currentPos &&
+    Math.hypot(currentPos.x - startPos.x, currentPos.y - startPos.y) >= 5;
+
   return (
     <Stage
       width={setting.fieldSizeScale.width}
@@ -232,17 +238,28 @@ const SetLocation = () => {
           closed
         />
 
-        {startPos && currentPos && (
-          <Arrow
-            points={getFixedArrowPoints()}
-            stroke="#FFFF00"
-            fill="#FFFF00"
-            strokeWidth={4}
-            pointerLength={10}
-            pointerWidth={10}
-            opacity={0.8}
-          />
-        )}
+        {/* 距離に応じて矢印か円を描画 */}
+        {startPos &&
+          currentPos &&
+          (isDragging ? (
+            <Arrow
+              points={getFixedArrowPoints()}
+              stroke="#FFFF00"
+              fill="#FFFF00"
+              strokeWidth={4}
+              pointerLength={10}
+              pointerWidth={10}
+              opacity={0.8}
+            />
+          ) : (
+            <Circle
+              x={startPos.x}
+              y={startPos.y}
+              radius={6}
+              fill="#FFFF00"
+              opacity={0.8}
+            />
+          ))}
       </Layer>
     </Stage>
   );
