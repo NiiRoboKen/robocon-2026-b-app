@@ -157,7 +157,6 @@ export const Preset = () => {
             </Button>
           </Grid>
 
-          {/* 移動 */}
           <Grid templateColumns="repeat(3, minmax(0, 1fr))" gap={2} w="100%">
             <GridItem colStart={2}>
               <Button
