@@ -241,6 +241,48 @@ const SetLocation = () => {
           closed
         />
 
+        {(() => {
+          // 指定された物理座標 (mm) と角度
+          const targetX = 4583.1;
+          const targetY = 4938.9;
+          const targetTheta = 11.7; // θ=166.0°
+
+          // 赤陣地モード時の座標反転
+          let displayX = targetX;
+          let displayTheta = targetTheta;
+          if (mode === "red") {
+            displayX = REAL_FIELD_W - targetX;
+            displayTheta = 180 - targetTheta;
+          }
+
+          // 物理座標からスクリーン座標 (px) への変換
+          const screenX = displayX * toScreenScaleX;
+          const screenY = (REAL_FIELD_H - targetY) * toScreenScaleY;
+
+          // 矢印のスクリーン上の長さ(px)
+          const arrowLength = 60;
+
+          // スクリーン座標系（Y軸下向き正）での終点計算
+          const rad = (displayTheta * Math.PI) / 180;
+          const dx = Math.cos(rad) * arrowLength;
+          const dy = -Math.sin(rad) * arrowLength; // Y軸は下が正なのでマイナスにする
+
+          return (
+            <Arrow
+              x={screenX}
+              y={screenY}
+              points={[0, 0, dx, dy]}
+              stroke="#00FFFF" // 目立つようにシアン（水色）
+              fill="#00FFFF"
+              strokeWidth={4}
+              pointerLength={10}
+              pointerWidth={10}
+              opacity={1.0}
+              listening={false} // クリックイベントの妨げにならないようにする
+            />
+          );
+        })()}
+
         {/* 距離に応じて三角形 または 矢印を描画 */}
         {startPos &&
           currentPos &&
