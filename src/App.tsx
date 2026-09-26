@@ -19,17 +19,12 @@ import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButto
 import AllStopButton from "./components/stop-button/StopButton.tsx";
 import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
 import { useModeStore } from "./hooks/useController.ts";
+import ResetButton from "./components/Reset-button/ResetButton.tsx";
+import { setting } from "./controller.ts";
 
 type ThemeType = "blue" | "red";
 
-type Pose = {
-  x: number;
-  y: number;
-  theta: number;
-};
-
-const FIELD_W = 6000;
-const ORIGIN_X = 1800;
+const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;
 
 const App = () => {
@@ -39,24 +34,6 @@ const App = () => {
 
   const theme = mode as ThemeType;
 
-  const initialPose = useMemo<Pose>(() => {
-    if (theme === "blue") {
-      return {
-        x: ORIGIN_X,
-        y: ORIGIN_Y,
-        theta: 0,
-      };
-    }
-
-    return {
-      x: FIELD_W - ORIGIN_X,
-      y: ORIGIN_Y,
-      theta: 0,
-    };
-  }, [theme]);
-
-  const [pose, setPose] = useState<Pose>(initialPose);
-
   const fieldRef = useRef<HTMLDivElement>(null);
 
   const [fieldSize, setFieldSize] = useState({
@@ -64,13 +41,20 @@ const App = () => {
     h: 1,
   });
 
-  useEffect(() => {
-    setPose(initialPose);
-  }, [initialPose]);
+  const absolutePose = useMemo(() => {
+    //赤モード時 Xの移動と回転を反転
+    const displayX = theme === "red" ? -realtimeStatus.x : realtimeStatus.x;
+    const displayTheta =
+      theme === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
+    return {
+      x: ORIGIN_X + displayX,
+      y: ORIGIN_Y + realtimeStatus.y,
+      theta: displayTheta,
+    };
+  }, [realtimeStatus]);
 
   useEffect(() => {
     connect();
-
     return () => {
       disconnect();
     };
@@ -78,12 +62,10 @@ const App = () => {
 
   useEffect(() => {
     const el = fieldRef.current;
-
     if (!el) return;
 
     const updateSize = () => {
       const rect = el.getBoundingClientRect();
-
       setFieldSize({
         w: rect.width,
         h: rect.height,
@@ -91,9 +73,7 @@ const App = () => {
     };
 
     updateSize();
-
     const observer = new ResizeObserver(updateSize);
-
     observer.observe(el);
 
     return () => {
@@ -101,19 +81,34 @@ const App = () => {
     };
   }, []);
 
-  const displayCoord = useMemo(() => {
-    if (theme === "blue") {
+  type ThemeType = "blue" | "red";
+
+  type Pose = {
+    x: number;
+    y: number;
+    theta: number;
+  };
+  const getInitialPose = (): Pose => {
+    if (theme === "red") {
       return {
-        x: pose.x - ORIGIN_X,
-        y: pose.y - ORIGIN_Y,
+        x: 1800,
+        y: 500,
+        theta: 0,
       };
     }
 
     return {
-      x: FIELD_W - pose.x - ORIGIN_X,
-      y: pose.y - ORIGIN_Y,
+      x: setting.fieldSize.width - 1800,
+      y: 500,
+      theta: 0,
     };
-  }, [pose, theme]);
+  };
+
+  const [pose, setPose] = useState<Pose>(getInitialPose);
+
+  const handleReset = () => {
+    setPose(getInitialPose());
+  };
 
   return (
     <ChakraProvider value={defaultSystem}>
@@ -159,15 +154,10 @@ const App = () => {
               <SetLocation />
 
               <Robot
-                x={pose.x}
-                y={pose.y}
-                theta={pose.theta}
+                x={absolutePose.x - 200} //表示用補正
+                y={absolutePose.y + 50}
+                theta={absolutePose.theta}
                 theme={theme}
-                imageSrc={
-                  theme === "blue"
-                    ? "/fieldBlueImage.png"
-                    : "/fieldRedImage.png"
-                }
               />
             </Box>
           </VStack>
@@ -186,15 +176,16 @@ const App = () => {
           >
             <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
-                x={realtimeStatus.x}
-                y={realtimeStatus.y}
-                theta={realtimeStatus.theta}
+                x={absolutePose.x} //実際の座標
+                y={absolutePose.y}
+                theta={absolutePose.theta}
                 connected={status === "CONNECTING" && espConnecting}
               />
             </Box>
 
             <AllStopButton />
             <ChangeThemeButton />
+            <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
             <LaunchButton />
             <Preset />

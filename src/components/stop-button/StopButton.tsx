@@ -1,16 +1,18 @@
 import { useWebSocket } from "../../websocket.ts";
 import "./StopButton.css";
+import { Button } from "@chakra-ui/react";
 
 const { sendMessage } = useWebSocket.getState();
 
 const AllStopButton = () => {
   return (
-    <button
+    <Button
       className="StopButton"
       onClick={() => sendMessage({ command: "emergency_stop" })}
+      rounded="3xl"
     >
       緊急停止
-    </button>
+    </Button>
   );
 };
 export default AllStopButton;

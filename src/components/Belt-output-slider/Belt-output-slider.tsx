@@ -15,6 +15,7 @@ export const BeltoOutputSlider = () => {
         max={2999}
         step={10}
         onValueChangeEnd={(e) => setShootPwm(e.value[0])}
+        colorPalette="green"
       >
         <Slider.Control>
           <Slider.Track>
