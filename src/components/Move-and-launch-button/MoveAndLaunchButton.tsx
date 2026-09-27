@@ -18,8 +18,8 @@ export const MoveAndLaunchButton = () => {
   // 目標地点の物理座標 (mm) と到着判定の閾値
   const TARGET_X = 4447;
   const TARGET_Y = 4866;
-  const TARGET_DEGREE = -75.89;
-  const ARRIVAL_THRESHOLD = 50;
+  const TARGET_DEGREE = -85.89;
+  const ARRIVAL_THRESHOLD = 40;
 
   // 座標変換用のフィールド定数
   const ORIGIN_X = 3900;
@@ -102,7 +102,7 @@ export const MoveAndLaunchButton = () => {
       setSequenceState("idle");
 
       // 射出後少し待機して初期位置へ移動
-      const delayMs = Math.max(shootTime * 1000, 500) + 200;
+      const delayMs = Math.max(shootTime * 1000, 500) + 500;
       setTimeout(() => {
         let resetX = 3900;
         const resetDegree = 0;
@@ -110,7 +110,7 @@ export const MoveAndLaunchButton = () => {
         if (mode === "red") {
           resetX = 1800;
         }
-        // リセットポジションへ移動
+        //リセットポジションへ移動;
         sendMessage({
           command: "navigate",
           x: resetX,
