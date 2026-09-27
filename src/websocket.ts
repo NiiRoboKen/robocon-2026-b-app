@@ -23,6 +23,7 @@ interface WebSocketState {
   status: "ERROR" | "CONNECTING" | "CLOSE";
   socket: ReconnectingWebSocket | null;
   tofStatus: ToFStatus;
+  lastCommand: { data: Commands | NavigateCommand; timestamp: number } | null;
   sendMessage: (data: Commands | NavigateCommand) => void;
   connect: () => void;
   disconnect: () => void;
@@ -32,6 +33,7 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
   socket: null,
   espConnecting: false,
   status: "CLOSE",
+  lastCommand: null,
   realtimeStatus: {
     x: setting.defaultRobotPosition.x,
     y: setting.defaultRobotPosition.y,
@@ -111,6 +113,7 @@ export const useWebSocket = create<WebSocketState>((set, get) => ({
   },
 
   sendMessage: (data: Commands | NavigateCommand) => {
+    set({ lastCommand: { data, timestamp: Date.now() } });
     const socket = get().socket;
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(data));
