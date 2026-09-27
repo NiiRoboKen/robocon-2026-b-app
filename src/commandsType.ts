@@ -7,6 +7,7 @@ export type Commands =
   | CurrentLocation
   | NavigateAbsolute
   | SetLocation
+  | ManualMove
   | ToFSenser
   | Shoot;
 
@@ -43,6 +44,13 @@ export type SetLocation = {
   x: number;
   y: number;
   degree: number;
+};
+
+export type ManualMove = {
+  command: "munual_move";
+  vx: number;
+  vy: number;
+  vtheta: number;
 };
 
 export type ToFSenser = {

@@ -15,6 +15,7 @@ import {
 
 import { BeltoOutputSlider } from "./components/Belt-output-slider/Belt-output-slider.tsx";
 import { Preset } from "./components/preset/Preset.tsx";
+//import { ManualControl } from "./components/manual-control/ManualControl.tsx";
 import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
 import AllStopButton from "./components/stop-button/StopButton.tsx";
 import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
