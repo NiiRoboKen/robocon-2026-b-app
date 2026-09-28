@@ -1,8 +1,17 @@
-import { Box, Grid, GridItem, Button, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Grid,
+  GridItem,
+  Button,
+  Slider,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { useWebSocket } from "../../websocket";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export const ManualControl = () => {
+  const [pwm, setPwm] = useState(500);
   const { sendMessage } = useWebSocket();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -14,22 +23,22 @@ export const ManualControl = () => {
       vtheta = 0;
     switch (direction) {
       case "up":
-        vx = 1;
+        vx = pwm;
         break;
       case "down":
-        vx = -1;
+        vx = -pwm;
         break;
       case "left":
-        vy = 1;
+        vy = pwm;
         break;
       case "right":
-        vy = -1;
+        vy = -pwm;
         break;
       case "ccw":
-        vtheta = 1;
+        vtheta = pwm;
         break;
       case "cw":
-        vtheta = -1;
+        vtheta = -pwm;
         break;
     }
 
@@ -67,7 +76,43 @@ export const ManualControl = () => {
 
   return (
     <VStack borderWidth="1px" borderRadius="md" p={4} align="stretch" gap={6}>
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap={6}
+      >
+        <Box w="100%" maxW="300px">
+          <Text fontSize="sm" fontWeight="bold" mb={2}>
+            PWM
+          </Text>
+          <Slider.Root
+            defaultValue={[500]}
+            min={100}
+            max={1000}
+            step={10}
+            onValueChange={(e) => setPwm(e.value[0])}
+            colorPalette="yellow"
+          >
+            <Slider.Control>
+              <Slider.Track>
+                <Slider.Range />
+              </Slider.Track>
+              <Slider.Thumb index={0}>
+                <Slider.ValueText
+                  position="absolute"
+                  bottom="100%"
+                  mb="8px"
+                  fontSize="sm"
+                  fontWeight="bold"
+                  whiteSpace="nowrap"
+                />
+              </Slider.Thumb>
+            </Slider.Control>
+          </Slider.Root>
+        </Box>
+
         <Grid templateColumns="repeat(3, 1fr)" gap={2} w="300px">
           <GridItem colStart={2}>
             <Button w="100%" bg="blue.500" color="white" {...bindEvents("up")}>
