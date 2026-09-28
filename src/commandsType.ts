@@ -47,7 +47,7 @@ export type SetLocation = {
 };
 
 export type ManualMove = {
-  command: "munual_move";
+  command: "manual_move";
   vx: number;
   vy: number;
   vtheta: number;
