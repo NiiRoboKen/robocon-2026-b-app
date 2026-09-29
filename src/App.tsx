@@ -24,6 +24,7 @@ import ResetButton from "./components/Reset-button/ResetButton.tsx";
 import { setting } from "./controller.ts";
 import { MoveAndLaunchButton } from "./components/Move-and-launch-button/MoveAndLaunchButton.tsx";
 import LoadButton from "./components/Load-button/LoadButton.tsx";
+import FlagButton from "./components/Flag-button/FlagButton.tsx";
 
 type ThemeType = "blue" | "red";
 
@@ -194,6 +195,7 @@ const App = () => {
               <LaunchButton />
               <MoveAndLaunchButton />
               <LoadButton />
+              <FlagButton />
             </HStack>
             <Preset />
           </VStack>
