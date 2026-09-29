@@ -23,6 +23,7 @@ import { useModeStore } from "./hooks/useController.ts";
 import ResetButton from "./components/Reset-button/ResetButton.tsx";
 import { setting } from "./controller.ts";
 import { MoveAndLaunchButton } from "./components/Move-and-launch-button/MoveAndLaunchButton.tsx";
+import LoadButton from "./components/Load-button/LoadButton.tsx";
 
 type ThemeType = "blue" | "red";
 
@@ -192,6 +193,7 @@ const App = () => {
             <HStack>
               <LaunchButton />
               <MoveAndLaunchButton />
+              <LoadButton />
             </HStack>
             <Preset />
           </VStack>
