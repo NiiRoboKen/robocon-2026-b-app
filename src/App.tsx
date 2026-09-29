@@ -153,6 +153,7 @@ const App = () => {
               m={0}
               p={0}
             >
+              <ChangeThemeButton />
               <SetLocation />
 
               <Robot
@@ -186,7 +187,6 @@ const App = () => {
             </Box>
 
             <AllStopButton />
-            <ChangeThemeButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
             <HStack>
