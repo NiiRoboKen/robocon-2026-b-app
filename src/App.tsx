@@ -154,10 +154,6 @@ const App = () => {
               m={0}
               p={0}
             >
-              <HStack p={1}>
-                <ChangeThemeButton />
-              </HStack>
-
               <SetLocation />
 
               <Robot
@@ -191,6 +187,7 @@ const App = () => {
             </Box>
 
             <AllStopButton />
+            <ChangeThemeButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
             <HStack>
