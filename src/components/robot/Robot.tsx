@@ -61,7 +61,7 @@ export const Robot = ({ x, y, theta = 0, theme }: RobotProps) => {
         style={{
           position: "absolute",
           left: "50%",
-          top: "15%",
+          top: "85%",
           width: pointSize,
           height: pointSize,
           transform: "translate(-50%, -50%)",

@@ -154,7 +154,10 @@ const App = () => {
               m={0}
               p={0}
             >
-              <ChangeThemeButton />
+              <HStack p={1}>
+                <ChangeThemeButton />
+              </HStack>
+
               <SetLocation />
 
               <Robot
