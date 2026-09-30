@@ -146,6 +146,13 @@ const App = () => {
             align="stretch"
             overflow="hidden"
           >
+            <Box p={2} borderBottom="1px solid" borderColor="gray.600">
+              <HStack>
+                <ChangeThemeButton />
+                {/* 必要に応じて他のボタンやステータス表示もここに追加できます */}
+              </HStack>
+            </Box>
+
             <Box
               ref={fieldRef}
               flex="1"
@@ -189,7 +196,6 @@ const App = () => {
             </Box>
 
             <AllStopButton />
-            <ChangeThemeButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
             <HStack>
