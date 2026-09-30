@@ -83,14 +83,20 @@ export const BucketButton = () => {
       ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
     const currentY = ORIGIN_Y + realtimeStatus.y;
 
+    let destDegree = TARGET_DEGREE;
+
     let destX = TARGET_X;
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
+      destDegree = -TARGET_DEGREE;
     }
     // 目標地点との直線距離を計算
     const dx = currentX - destX;
     const dy = currentY - TARGET_Y;
     const dist = Math.hypot(dx, dy);
+
+    //let dDegree = realtimeStatus.theta - destDegree;
+    //dDegree = ((dDegree + 540) % 360) - 180;//ToDo 赤ゾーンで角度判定見る
 
     // 射出コマンドの送信
     if (dist < ARRIVAL_THRESHOLD) {

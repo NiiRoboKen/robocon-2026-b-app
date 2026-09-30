@@ -41,7 +41,7 @@ export const FlagButton = () => {
     // 赤陣地モードの場合はX座標と角度を反転
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE;
+      destDegree = 180 - TARGET_DEGREE; //ToDoフィールドで見てなおす
     }
 
     isOurCommand.current = true;
