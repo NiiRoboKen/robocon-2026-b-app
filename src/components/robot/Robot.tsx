@@ -26,7 +26,7 @@ export const Robot = ({ x, y, theta = 0, theme }: RobotProps) => {
 
   if (theme === "red") {
     fieldX = FIELD_WIDTH_MM - fieldX;
-    displayTheta = 180 - theta;
+    displayTheta = -theta;
   }
 
   const px = (fieldX / FIELD_WIDTH_MM) * displayWidth;
