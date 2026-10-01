@@ -24,16 +24,16 @@ const ARROW_FIXED_LENGTH = 60; // 矢印の固定長
 const DISPLAY_DURATION_MS = 1500; // 矢印を表示し続ける時間
 
 const NO_ENTRY_ZONES = [
-  { minX: 0, maxX: 950, minY: 0, maxY: 1190 },
-  { minX: 990, maxX: 2500, minY: 2100, maxY: 3810 },
-  { minX: 3320, maxX: 4700, minY: 3300, maxY: 4670 },
-  { minX: 0, maxX: 1390, minY: 5090, maxY: 6510 },
-  { minX: 1850, maxX: 3250, minY: 5070, maxY: 6530 },
-  { minX: 3960, maxX: 5240, minY: 5160, maxY: 6440 },
-  { minX: 3320, maxX: 4700, minY: 6930, maxY: 8300 },
-  { minX: 990, maxX: 2500, minY: 7790, maxY: 9500 },
-  { minX: 3700, maxX: 5100, minY: 0, maxY: 1350 },
-  { minX: 4620, maxX: 5700, minY: 0, maxY: 10500 },
+  { minX: 0, maxX: 925, minY: 0, maxY: 1125 },
+  { minX: 1175, maxX: 2575, minY: 2125, maxY: 3785 },
+  { minX: 3565, maxX: 4875, minY: 3325, maxY: 4635 },
+  { minX: 15, maxX: 1425, minY: 5115, maxY: 6485 },
+  { minX: 1975, maxX: 3375, minY: 5100, maxY: 6500 },
+  { minX: 4185, maxX: 5475, minY: 5155, maxY: 6445 },
+  { minX: 3565, maxX: 4875, minY: 6965, maxY: 8275 },
+  { minX: 1175, maxX: 2575, minY: 7815, maxY: 9475 },
+  { minX: 3950, maxX: 5300, minY: 0, maxY: 1275 },
+  { minX: 4925, maxX: 5700, minY: 0, maxY: 10500 },
 ];
 
 const CIRCLE_OBSTACLES = [
@@ -178,9 +178,17 @@ const SetLocation = () => {
           height={setting.fieldSizeScale.height}
         />
         {NO_ENTRY_ZONES.map((zone, index) => {
-          let x = zone.minX;
-          const w = zone.maxX - zone.minX;
-          const h = zone.maxY - zone.minY;
+          const VISUAL_OFFSET_X = -200;
+          const VISUAL_OFFSET_Y = 50;
+
+          const displayMinX = zone.minX + VISUAL_OFFSET_X;
+          const displayMaxX = zone.maxX + VISUAL_OFFSET_X;
+          const displayMinY = zone.minY + VISUAL_OFFSET_Y;
+          const displayMaxY = zone.maxY + VISUAL_OFFSET_Y;
+
+          let x = displayMinX;
+          const w = displayMaxX - displayMinX;
+          const h = displayMaxY - displayMinY;
 
           // 赤陣地の場合はX座標を反転 (右端の座標基準)
           if (mode === "red") {
