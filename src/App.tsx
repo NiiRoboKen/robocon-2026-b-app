@@ -149,7 +149,12 @@ const App = () => {
             <Box p={2} borderBottom="1px solid" borderColor="gray.600">
               <HStack>
                 <ChangeThemeButton />
-                {/* 必要に応じて他のボタンやステータス表示もここに追加できます */}
+                <RobotCoordinate
+                  x={absolutePose.x} //実際の座標
+                  y={absolutePose.y}
+                  theta={absolutePose.theta}
+                  connected={status === "CONNECTING" && espConnecting}
+                />
               </HStack>
             </Box>
 
@@ -186,19 +191,19 @@ const App = () => {
             p={4}
             overflow="hidden"
           >
-            <Box flexShrink={0} m={0} p={0}>
+            {/* <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
                 x={absolutePose.x} //実際の座標
                 y={absolutePose.y}
                 theta={absolutePose.theta}
                 connected={status === "CONNECTING" && espConnecting}
               />
-            </Box>
+            </Box>*/}
 
             <AllStopButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
-            <HStack>
+            <HStack flexWrap="wrap">
               <LaunchButton />
               {/* <MoveAndLaunchButton /> */}
               <LoadButton />
