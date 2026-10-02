@@ -28,8 +28,6 @@ import { FlagButton } from "./components/Flag-button/FlagButton.tsx";
 import { BucketButton } from "./components/Bucket-Button/BucketButton.tsx";
 import IntimidationButton from "./components/Intimidation-button/IntimidationButton.tsx";
 
-type ThemeType = "blue" | "red";
-
 const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;
 
@@ -212,6 +210,7 @@ const App = () => {
               <BucketButton />
               <IntimidationButton />
             </HStack>
+            <IntimidationButton />
             <Preset />
           </VStack>
         </HStack>
