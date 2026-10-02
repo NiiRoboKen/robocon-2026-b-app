@@ -161,7 +161,7 @@ const IntimidationButton = () => {
     <Button
       onClick={handleClick}
       rounded="3xl"
-      bg={sequenceState === "idle" ? "purple.500" : "red.500"}
+      bg={sequenceState === "idle" ? "teal.400" : "red.500"}
       color="white"
       _active={{
         transform: "translateY(3px)",

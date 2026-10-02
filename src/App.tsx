@@ -210,7 +210,6 @@ const App = () => {
               <BucketButton />
               <IntimidationButton />
             </HStack>
-            <IntimidationButton />
             <Preset />
           </VStack>
         </HStack>

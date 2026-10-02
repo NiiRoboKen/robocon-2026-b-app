@@ -15,7 +15,7 @@ export const LaunchButton = () => {
 
   return (
     <div>
-      <Button onClick={handleLaunch} bg="green.600">
+      <Button onClick={handleLaunch} bg="green.400">
         発射
       </Button>
     </div>
