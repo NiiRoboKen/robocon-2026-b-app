@@ -141,7 +141,7 @@ export const FlagButton = () => {
     <div>
       <Button
         onClick={handleClick}
-        bg={sequenceState === "idle" ? "orange.400" : "red.500"}
+        bg={sequenceState === "idle" ? "cyan.400" : "red.500"}
         color="white"
       >
         {sequenceState === "idle" ? "移動&旗" : "キャンセル（移動中）"}

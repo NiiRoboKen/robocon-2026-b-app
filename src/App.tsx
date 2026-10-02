@@ -26,6 +26,7 @@ import { setting } from "./controller.ts";
 import LoadButton from "./components/Load-button/LoadButton.tsx";
 import { FlagButton } from "./components/Flag-button/FlagButton.tsx";
 import { BucketButton } from "./components/Bucket-Button/BucketButton.tsx";
+import IntimidationButton from "./components/Intimidation-button/IntimidationButton.tsx";
 
 type ThemeType = "blue" | "red";
 
@@ -209,6 +210,7 @@ const App = () => {
               <LoadButton />
               <FlagButton />
               <BucketButton />
+              <IntimidationButton />
             </HStack>
             <Preset />
           </VStack>

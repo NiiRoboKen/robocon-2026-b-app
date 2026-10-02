@@ -143,7 +143,7 @@ export const BucketButton = () => {
     <div>
       <Button
         onClick={handleClick}
-        bg={sequenceState === "idle" ? "orange.400" : "red.500"}
+        bg={sequenceState === "idle" ? "purple.400" : "red.500"}
         color="white"
       >
         {sequenceState === "idle" ? "移動&バケツ" : "キャンセル（移動中）"}
