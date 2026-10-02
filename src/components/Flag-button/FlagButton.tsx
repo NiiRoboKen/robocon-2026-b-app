@@ -3,6 +3,18 @@ import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useController, useModeStore } from "../../hooks/useController";
 
+// 目標地点の物理座標 (mm) と到着判定の閾値
+const TARGET_X = 4447;
+const TARGET_Y = 4866;
+const TARGET_DEGREE = -85.89;
+const ARRIVAL_THRESHOLD = 50;
+const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
+
+// 座標変換用のフィールド定数
+const ORIGIN_X = 3900;
+const ORIGIN_Y = 500;
+const FIELD_WIDTH = 5700;
+
 export const FlagButton = () => {
   const { sendMessage, realtimeStatus, lastCommand } = useWebSocket();
   const { shootPwm, shootTime } = useController();
@@ -14,17 +26,6 @@ export const FlagButton = () => {
   >("idle");
 
   const isOurCommand = useRef(false);
-
-  // 目標地点の物理座標 (mm) と到着判定の閾値
-  const TARGET_X = 4447;
-  const TARGET_Y = 4866;
-  const TARGET_DEGREE = -85.89;
-  const ARRIVAL_THRESHOLD = 50;
-
-  // 座標変換用のフィールド定数
-  const ORIGIN_X = 3900;
-  const ORIGIN_Y = 500;
-  const FIELD_WIDTH = 5700;
 
   // ボタンクリック時
   const handleClick = () => {
@@ -79,18 +80,28 @@ export const FlagButton = () => {
     const currentX =
       ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
     const currentY = ORIGIN_Y + realtimeStatus.y;
+    const currentTheta =
+      mode === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
 
     let destX = TARGET_X;
+    let destDegree = TARGET_DEGREE;
+
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
+      destDegree = 180 - TARGET_DEGREE;
     }
     // 目標地点との直線距離を計算
     const dx = currentX - destX;
     const dy = currentY - TARGET_Y;
     const dist = Math.hypot(dx, dy);
 
+    // 目標角度との差を計算 (-180〜180度の範囲に正規化)
+    let diffDegree = currentTheta - destDegree;
+    diffDegree = ((diffDegree + 540) % 360) - 180;
+    const isAngleMatched = Math.abs(diffDegree) < ANGLE_THRESHOLD;
+
     // 射出コマンドの送信
-    if (dist < ARRIVAL_THRESHOLD) {
+    if (dist < ARRIVAL_THRESHOLD && isAngleMatched) {
       isOurCommand.current = true;
 
       sendMessage({
