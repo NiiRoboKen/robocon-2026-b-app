@@ -169,7 +169,7 @@ const App = () => {
               <SetLocation />
 
               <Robot
-                x={absolutePose.x - 200} //表示用補正
+                x={absolutePose.x + (theme === "red" ? 200 : -200)}
                 y={absolutePose.y + 50}
                 theta={absolutePose.theta}
                 theme={theme}
