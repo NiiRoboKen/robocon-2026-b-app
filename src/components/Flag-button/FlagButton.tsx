@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "../Button/Button";
 import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useController, useModeStore } from "../../hooks/useController";
@@ -141,9 +141,7 @@ export const FlagButton = () => {
     <div>
       <Button
         onClick={handleClick}
-        rounded="3xl"
         bg={sequenceState === "idle" ? "cyan.400" : "red.500"}
-        color="white"
       >
         {sequenceState === "idle" ? "移動&旗" : "キャンセル（移動中）"}
       </Button>

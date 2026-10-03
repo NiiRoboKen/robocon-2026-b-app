@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "../Button/Button";
 import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
@@ -160,12 +160,7 @@ const IntimidationButton = () => {
   return (
     <Button
       onClick={handleClick}
-      rounded="3xl"
       bg={sequenceState === "idle" ? "teal.400" : "red.500"}
-      color="white"
-      _active={{
-        transform: "translateY(3px)",
-      }}
     >
       {sequenceState === "idle" ? "おどし♬" : "キャンセル（旋回中）"}
     </Button>

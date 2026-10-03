@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "../Button/Button";
 import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
@@ -144,8 +144,6 @@ export const BucketButton = () => {
       <Button
         onClick={handleClick}
         bg={sequenceState === "idle" ? "purple.400" : "red.500"}
-        color="white"
-        rounded="3xl"
       >
         {sequenceState === "idle" ? "移動&バケツ" : "キャンセル（移動中）"}
       </Button>

@@ -1,17 +1,7 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "../Button/Button";
 
 const LoadButton = () => {
-  return (
-    <Button
-      rounded="3xl"
-      background="orange.400"
-      _active={{
-        transform: "translateY(3px)",
-      }}
-    >
-      装填
-    </Button>
-  );
+  return <Button bg="orange.400">装填</Button>;
 };
 
 export default LoadButton;

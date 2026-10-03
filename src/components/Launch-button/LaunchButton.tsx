@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "../Button/Button";
 import { useWebSocket } from "../../websocket";
 import { useController } from "../../hooks/useController";
 export const LaunchButton = () => {
@@ -15,7 +15,7 @@ export const LaunchButton = () => {
 
   return (
     <div>
-      <Button onClick={handleLaunch} bg="green.400" rounded="3xl">
+      <Button onClick={handleLaunch} bg="green.400">
         発射
       </Button>
     </div>
