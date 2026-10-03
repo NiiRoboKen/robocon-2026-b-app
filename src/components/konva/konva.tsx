@@ -25,20 +25,19 @@ const DISPLAY_DURATION_MS = 1500; // 矢印を表示し続ける時間
 
 const NO_ENTRY_ZONES = [
   { minX: 0, maxX: 925, minY: 0, maxY: 1125 },
-  { minX: 1175, maxX: 2575, minY: 2125, maxY: 3785 },
+  { minX: 1115, maxX: 2575, minY: 2125, maxY: 3785 },
   { minX: 3565, maxX: 4875, minY: 3325, maxY: 4635 },
   { minX: 15, maxX: 1425, minY: 5115, maxY: 6485 },
   { minX: 1975, maxX: 3375, minY: 5100, maxY: 6500 },
   { minX: 4185, maxX: 5475, minY: 5155, maxY: 6445 },
   { minX: 3565, maxX: 4875, minY: 6965, maxY: 8275 },
-  { minX: 1175, maxX: 2575, minY: 7815, maxY: 9475 },
+  { minX: 1115, maxX: 2575, minY: 7815, maxY: 9475 },
   { minX: 3950, maxX: 5300, minY: 0, maxY: 1275 },
   { minX: 4925, maxX: 5700, minY: 0, maxY: 10500 },
 ];
-
 const CIRCLE_OBSTACLES = [
   {
-    // フィールド右端(REAL_FIELD_W)からさらに右へ2800の位置
+    // 青フィールド右端(REAL_FIELD_W)からさらに右へ2800の位置
     centerX: REAL_FIELD_W + 2800,
     centerY: 5700 + 50,
     radius: 3500,
@@ -102,18 +101,21 @@ const SetLocation = () => {
   };
 
   // スクリーン座標とフィールドの物理座標変換
-  // スクリーン座標とフィールドの物理座標変換
   const toScreenScaleX = setting.fieldSizeScale.width / REAL_FIELD_W;
   const toScreenScaleY = setting.fieldSizeScale.height / REAL_FIELD_H;
 
-  // ★ 修正：赤モード時はオフセットを +200 に反転
-  const VISUAL_OFFSET_X = mode === "red" ? 200 : -200;
-  const VISUAL_OFFSET_Y = 50;
+  // 赤モード時はオフセットを +200 に反転
+  const VISUAL_OFFSET_X = mode === "red" ? 260 : -260;
+  const VISUAL_OFFSET_Y = 0;
 
-  // ★ 修正：物理X座標 → 画面X座標への変換（赤陣地時の左右反転を含める）
+  // 補正の基準は常に教壇側
+  const X_ANCHOR = mode === "red" ? 0 : REAL_FIELD_W;
+  const X_SCALE_FIX = 0.96;
+
   const getScreenX = (physicalX: number) => {
     const displayX = mode === "red" ? REAL_FIELD_W - physicalX : physicalX;
-    return (displayX + VISUAL_OFFSET_X) * toScreenScaleX;
+    const fixedX = X_ANCHOR + (displayX - X_ANCHOR) * X_SCALE_FIX;
+    return (fixedX + VISUAL_OFFSET_X) * toScreenScaleX;
   };
 
   const getScreenY = (physicalY: number) => {
@@ -123,9 +125,8 @@ const SetLocation = () => {
   const handlePointerUp = () => {
     if (!startPos || !currentPos) return;
 
-    // ★ 修正：逆算時にも赤陣地の反転を考慮する
-    const displayX = startPos.x / toScreenScaleX - VISUAL_OFFSET_X;
-    const realX = mode === "red" ? REAL_FIELD_W - displayX : displayX;
+    const displayXRaw = startPos.x / toScreenScaleX - VISUAL_OFFSET_X;
+    const realX = X_ANCHOR + (displayXRaw - X_ANCHOR) / X_SCALE_FIX;
     const realY = REAL_FIELD_H - startPos.y / toScreenScaleY - VISUAL_OFFSET_Y;
 
     let targetDegree = 0;
@@ -133,9 +134,7 @@ const SetLocation = () => {
     const dy = currentPos.y - startPos.y;
 
     if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-      // ★ ドラッグ角度の反転処理を復活させる
-      const rawDegree = Math.atan2(-dx, -dy) * (180 / Math.PI);
-      targetDegree = mode === "red" ? -rawDegree : rawDegree;
+      targetDegree = Math.atan2(-dx, -dy) * (180 / Math.PI);
     }
 
     sendMessage({
@@ -256,7 +255,7 @@ const SetLocation = () => {
           const targetY = 4938.9;
           const targetTheta = 11.7;
 
-          // ★ 修正：赤陣地モード時の見た目の角度反転
+          // 赤陣地モード時の見た目の角度反転
           const displayTheta = mode === "red" ? targetTheta : targetTheta;
 
           const screenX = getScreenX(targetX);
