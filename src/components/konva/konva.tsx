@@ -212,10 +212,17 @@ const SetLocation = () => {
           );
         })}
 
-        {/* CIRCLE_OBSTACLES の描画 */}
+        {/* CIRCLE_OBSTACLES の描画(補正前の変換で固定) */}
         {CIRCLE_OBSTACLES.map((obstacle, index) => {
-          const screenX = getScreenX(obstacle.centerX);
-          const screenY = getScreenY(obstacle.centerY);
+          const CIRCLE_OFFSET_X = mode === "red" ? 200 : -200;
+          const CIRCLE_OFFSET_Y = 50;
+
+          const displayX =
+            mode === "red" ? REAL_FIELD_W - obstacle.centerX : obstacle.centerX;
+          const screenX = (displayX + CIRCLE_OFFSET_X) * toScreenScaleX;
+          const screenY =
+            (REAL_FIELD_H - (obstacle.centerY + CIRCLE_OFFSET_Y)) *
+            toScreenScaleY;
           const screenRadius = obstacle.radius * toScreenScaleX;
 
           return (
@@ -230,24 +237,6 @@ const SetLocation = () => {
             />
           );
         })}
-
-        <Line
-          points={[
-            0,
-            0,
-            setting.fieldSizeScale.width,
-            0,
-            setting.fieldSizeScale.width,
-            setting.fieldSizeScale.height,
-            0,
-            setting.fieldSizeScale.height,
-            0,
-            0,
-          ]}
-          stroke={colorTheme.colors.other}
-          strokeWidth={10}
-          closed
-        />
 
         {/* 水色矢印の描画 */}
         {(() => {
