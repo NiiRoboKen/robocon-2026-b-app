@@ -58,7 +58,7 @@ const SetLocation = () => {
   const [currentPos, setCurrentPos] = useState<{ x: number; y: number } | null>(
     null,
   );
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   //タイマー初期化
   useEffect(() => {
     return () => {
