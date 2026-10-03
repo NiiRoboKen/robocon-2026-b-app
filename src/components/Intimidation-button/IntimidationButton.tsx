@@ -90,12 +90,7 @@ const IntimidationButton = () => {
     const dx = absoluteTargetX - destX;
     const dy = TARGET_Y - destY;
     const rawDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
-    let destDegree = getThemedDegree(rawDegree, mode);
-
-    // 赤陣地のときは角度を -90度 する(-180〜180度に正規化)
-    if (mode === "red") {
-      destDegree = ((destDegree - 90 + 540) % 360) - 180;
-    }
+    const destDegree = getThemedDegree(rawDegree, mode);
 
     setApproachPose({ x: destX, y: destY, degree: destDegree });
     isOurCommand.current = true;
