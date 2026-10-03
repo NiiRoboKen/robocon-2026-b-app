@@ -14,6 +14,7 @@ import Konva from "konva";
 import { useModeStore } from "../../hooks/useController";
 import { ModeTheme, setting } from "../../controller";
 import { useWebSocket } from "../../websocket";
+import { getThemedX, getThemedDegree } from "../../controller";
 
 // 実フィールドの物理サイズ (mm)
 const REAL_FIELD_W = setting.fieldSize.width;
@@ -110,23 +111,20 @@ const SetLocation = () => {
   const handlePointerUp = () => {
     if (!startPos || !currentPos) return;
 
-    let realX = startPos.x * toRealScaleX;
+    const rawRealX = startPos.x * toRealScaleX;
     const realY = REAL_FIELD_H - startPos.y * toRealScaleY;
     let targetDegree = 0;
 
     // ドラッグ時ベクトル計算
-    let dx = currentPos.x - startPos.x;
+    const dx = currentPos.x - startPos.x;
     const dy = -(currentPos.y - startPos.y);
 
-    // 赤陣地モードの場合はX座標と向きを反転して対称にする
-    if (mode === "red") {
-      realX = REAL_FIELD_W - realX;
-      dx = -dx;
-    }
     // 誤操作防止用（5px以上ドラッグした場合のみ角度を計算）
     if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-      targetDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
+      const rawDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
+      targetDegree = getThemedDegree(rawDegree, mode);
     }
+    const realX = getThemedX(rawRealX, mode);
 
     sendMessage({
       command: "navigate",
@@ -256,12 +254,8 @@ const SetLocation = () => {
           const targetTheta = 11.7; // θ=166.0°
 
           // 赤陣地モード時の座標反転
-          let displayX = targetX;
-          let displayTheta = targetTheta;
-          if (mode === "red") {
-            displayX = REAL_FIELD_W - targetX;
-            displayTheta = 180 - targetTheta;
-          }
+          const displayX = getThemedX(targetX, mode);
+          const displayTheta = getThemedDegree(targetTheta, mode);
 
           // 物理座標からスクリーン座標 (px) への変換
           const screenX = displayX * toScreenScaleX;

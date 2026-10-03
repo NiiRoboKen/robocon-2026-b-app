@@ -2,6 +2,7 @@ import { Button } from "../Button/Button";
 import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useController, useModeStore } from "../../hooks/useController";
+import { getThemedPose } from "../../controller";
 
 export const MoveAndLaunchButton = () => {
   const { sendMessage, realtimeStatus, lastCommand } = useWebSocket();
@@ -35,14 +36,7 @@ export const MoveAndLaunchButton = () => {
       return;
     }
 
-    let destX = TARGET_X;
-    let destDegree = TARGET_DEGREE;
-
-    // 赤陣地モードの場合はX座標と角度を反転
-    if (mode === "red") {
-      destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE;
-    }
+    const dest = getThemedPose(TARGET_X, TARGET_Y, TARGET_DEGREE, mode);
 
     isOurCommand.current = true;
     setSequenceState("moving_to_target");
@@ -50,12 +44,11 @@ export const MoveAndLaunchButton = () => {
     // 目標座標への移動コマンドを送信
     sendMessage({
       command: "navigate",
-      x: destX,
-      y: TARGET_Y,
-      degree: destDegree,
+      x: dest.x,
+      y: dest.y,
+      degree: dest.degree,
       theme: mode,
     });
-
     //コマンド発行フラグをリセット;
     setTimeout(() => {
       isOurCommand.current = false;
@@ -104,21 +97,15 @@ export const MoveAndLaunchButton = () => {
       // 射出後少し待機して初期位置へ移動
       const delayMs = Math.max(shootTime * 1000, 500) + 500;
       setTimeout(() => {
-        let resetX = 3900;
-        const resetDegree = 0;
-
-        if (mode === "red") {
-          resetX = 1800;
-        }
+        const reset = getThemedPose(3900, 500, 0, mode);
         //リセットポジションへ移動;
         sendMessage({
           command: "navigate",
-          x: resetX,
-          y: 500,
-          degree: resetDegree,
+          x: reset.x,
+          y: reset.y,
+          degree: reset.degree,
           theme: mode,
         });
-
         setTimeout(() => {
           isOurCommand.current = false;
         }, 200);

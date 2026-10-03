@@ -11,6 +11,29 @@ export type ToFStatus = {
   distance: number;
   degree: number;
 };
+
+// app/controller.ts 内の末尾などに追記
+export const getThemedX = (x: number, theme: "blue" | "red") => {
+  return theme === "red" ? setting.fieldSize.width - x : x;
+};
+
+export const getThemedDegree = (degree: number, theme: "blue" | "red") => {
+  return theme === "red" ? -degree : degree;
+};
+
+export const getThemedPose = (
+  x: number,
+  y: number,
+  degree: number,
+  theme: "blue" | "red",
+) => {
+  return {
+    x: getThemedX(x, theme),
+    y,
+    degree: getThemedDegree(degree, theme),
+  };
+};
+
 // フィールドやロボットの物理寸法 UI表示用のスケール変換
 class Setting {
   fieldSize = { width: 5700, height: 10500 };
@@ -23,6 +46,7 @@ class Setting {
       theta: 0,
     };
   }
+
   // ウィンドウの高さ(90%)基準
   // 実寸のアスペクト比を維持したフィールドのスクリーン描画サイズ算出
   get fieldSizeScale() {

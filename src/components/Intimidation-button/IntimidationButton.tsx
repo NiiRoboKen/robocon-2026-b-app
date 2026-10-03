@@ -2,6 +2,7 @@ import { Button } from "../Button/Button";
 import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
+import { getThemedX, getThemedDegree } from "../../controller";
 
 const TARGET_X = 3900;
 const TARGET_Y = 0;
@@ -57,10 +58,7 @@ const IntimidationButton = () => {
       ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
     const currentY = ORIGIN_Y + realtimeStatus.y;
 
-    let absoluteTargetX = TARGET_X;
-    if (mode === "red") {
-      absoluteTargetX = FIELD_WIDTH - TARGET_X;
-    }
+    const absoluteTargetX = getThemedX(TARGET_X, mode);
 
     const distToTarget = Math.hypot(
       absoluteTargetX - currentX,
@@ -78,11 +76,8 @@ const IntimidationButton = () => {
 
     const dx = absoluteTargetX - destX;
     const dy = TARGET_Y - destY;
-    let destDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
-
-    if (mode === "red") {
-      destDegree = -destDegree;
-    }
+    const rawDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
+    const destDegree = getThemedDegree(rawDegree, mode);
 
     setApproachPose({ x: destX, y: destY, degree: destDegree });
     isOurCommand.current = true;
