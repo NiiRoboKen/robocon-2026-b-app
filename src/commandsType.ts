@@ -9,7 +9,8 @@ export type Commands =
   | SetLocation
   | ManualMove
   | ToFSenser
-  | Shoot;
+  | Shoot
+  | Load;
 
 export type ReceiveSuccess = {
   command: "receive_success";
@@ -70,4 +71,8 @@ export type Shoot = {
   command: "shoot";
   pwm: number;
   time: number;
+};
+
+export type Load = {
+  command: "load";
 };

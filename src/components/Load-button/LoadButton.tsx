@@ -1,7 +1,20 @@
 import { Button } from "../Button/Button";
+import { useWebSocket } from "../../websocket";
 
-const LoadButton = () => {
-  return <Button bg="orange.400">装填</Button>;
+export const LoadButton = () => {
+  const { sendMessage } = useWebSocket();
+
+  const handleLoad = () => {
+    sendMessage({
+      command: "load",
+    });
+  };
+
+  return (
+    <div>
+      <Button onClick={handleLoad} bg="orange.400">
+        装填
+      </Button>
+    </div>
+  );
 };
-
-export default LoadButton;
