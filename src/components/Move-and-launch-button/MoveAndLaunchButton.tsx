@@ -130,6 +130,7 @@ export const MoveAndLaunchButton = () => {
     <div>
       <Button
         onClick={handleClick}
+        rounded="3xl"
         bg={sequenceState === "idle" ? "orange.400" : "red.500"}
         color="white"
       >

@@ -141,6 +141,7 @@ export const FlagButton = () => {
     <div>
       <Button
         onClick={handleClick}
+        rounded="3xl"
         bg={sequenceState === "idle" ? "cyan.400" : "red.500"}
         color="white"
       >

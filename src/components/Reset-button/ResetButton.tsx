@@ -33,7 +33,7 @@ const ResetButton = ({ onReset }: ResetButtonProps) => {
         transform: "translateY(3px)",
       }}
     >
-      Reset Position
+      リセットポジション
     </Button>
   );
 };
