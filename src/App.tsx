@@ -14,8 +14,8 @@ import {
 } from "@chakra-ui/react";
 
 import { BeltoOutputSlider } from "./components/Belt-output-slider/Belt-output-slider.tsx";
-import { Preset } from "./components/preset/Preset.tsx";
-//import { ManualControl } from "./components/manual-control/ManualControl.tsx";
+// import { Preset } from "./components/preset/Preset.tsx";
+import { ManualControl } from "./components/manual-control/ManualControl.tsx";
 import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
 import AllStopButton from "./components/stop-button/StopButton.tsx";
 import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
@@ -46,16 +46,15 @@ const App = () => {
   });
 
   const absolutePose = useMemo(() => {
-    //赤モード時 Xの移動と回転を反転
-    const displayX = theme === "red" ? -realtimeStatus.x : realtimeStatus.x;
-    const displayTheta =
-      theme === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
+    // 原点は赤1800、青3900で正解
+    const baseOriginX =
+      theme === "red" ? setting.fieldSize.width - ORIGIN_X : ORIGIN_X;
     return {
-      x: ORIGIN_X + displayX,
+      x: baseOriginX + realtimeStatus.x,
       y: ORIGIN_Y + realtimeStatus.y,
-      theta: displayTheta,
+      theta: realtimeStatus.theta,
     };
-  }, [realtimeStatus]);
+  }, [realtimeStatus, theme]);
 
   useEffect(() => {
     connect();
@@ -210,7 +209,8 @@ const App = () => {
               <BucketButton />
               <IntimidationButton />
             </HStack>
-            <Preset />
+            {/* <Preset /> */}
+            <ManualControl />
           </VStack>
         </HStack>
       </Box>

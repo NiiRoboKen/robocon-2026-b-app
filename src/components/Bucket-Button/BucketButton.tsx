@@ -9,7 +9,7 @@ const TARGET_Y = 4046;
 const TARGET_DEGREE = -88.35;
 const ARRIVAL_THRESHOLD = 50;
 const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
-
+const LounchDelay = 4000; // 2回目と3回目の間隔（4秒）
 //発射スピードと時間
 const OUTPUT_PWM = 1810;
 const OUTPUT_TIME = 0.3;
@@ -45,7 +45,7 @@ export const BucketButton = () => {
     // 赤陣地モードの場合はX座標と角度を反転
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE;
+      destDegree = -TARGET_DEGREE;
     }
 
     isOurCommand.current = true;
@@ -79,25 +79,31 @@ export const BucketButton = () => {
   useEffect(() => {
     if (sequenceState !== "moving_to_target") return;
 
-    // 現在の絶対座標を算出
-    const currentX =
-      ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
+    // ★ 赤陣地の基準X座標（1800）を正しく計算する
+    const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
+
+    // ★ 反転処理を削除し、純粋に基準位置からの移動量を足す
+    const currentX = baseOriginX + realtimeStatus.x;
     const currentY = ORIGIN_Y + realtimeStatus.y;
-    const currentTheta =
-      mode === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
+
+    // ★ 角度も既にロボット側で実態に合っているため、反転させずにそのまま使用する
+    const currentTheta = realtimeStatus.theta;
+
     let destX = TARGET_X;
-    let destDegree = TARGET_DEGREE;
+    let destDegree = TARGET_DEGREE; // 判定用の目標角度を追加
 
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE;
+      destDegree = -TARGET_DEGREE; // 判定用の目標角度も反転させる
     }
+
     // 目標地点との直線距離を計算
     const dx = currentX - destX;
     const dy = currentY - TARGET_Y;
     const dist = Math.hypot(dx, dy);
 
     // 目標角度との差を計算 (-180〜180度の範囲に正規化)
+    // 固定のTARGET_DEGREEではなく、赤青を考慮したdestDegreeと比較する
     let diffDegree = currentTheta - destDegree;
     diffDegree = ((diffDegree + 540) % 360) - 180;
     const isAngleMatched = Math.abs(diffDegree) < ANGLE_THRESHOLD;
@@ -106,6 +112,7 @@ export const BucketButton = () => {
     if (dist < ARRIVAL_THRESHOLD && isAngleMatched) {
       isOurCommand.current = true;
 
+      // 1回目の射出（到着直後）
       sendMessage({
         command: "shoot",
         pwm: OUTPUT_PWM,
@@ -114,28 +121,52 @@ export const BucketButton = () => {
 
       setSequenceState("idle");
 
-      // 射出後少し待機して初期位置へ移動
-      const delayMs = Math.max(OUTPUT_TIME * 1000, 500) + 500;
+      // 2回目の射出（LounchDelay後）
       setTimeout(() => {
-        let resetX = 3900;
-        const resetDegree = 0;
+        isOurCommand.current = true;
 
-        if (mode === "red") {
-          resetX = 1800;
-        }
-        //リセットポジションへ移動;
         sendMessage({
-          command: "navigate",
-          x: resetX,
-          y: 500,
-          degree: resetDegree,
-          theme: mode,
+          command: "shoot",
+          pwm: OUTPUT_PWM,
+          time: OUTPUT_TIME,
         });
 
+        // 3回目の射出（2回目からさらにLounchDelay後）
         setTimeout(() => {
-          isOurCommand.current = false;
-        }, 200);
-      }, delayMs);
+          isOurCommand.current = true;
+
+          sendMessage({
+            command: "shoot",
+            pwm: OUTPUT_PWM,
+            time: OUTPUT_TIME,
+          });
+
+          // 3回目の射出後少し待機して初期位置へ移動
+          const delayMs = Math.max(OUTPUT_TIME * 1000, 500) + 500;
+          setTimeout(() => {
+            let resetX = 3900;
+            const resetDegree = 0;
+
+            // 赤陣地用のリセット位置を設定
+            if (mode === "red") {
+              resetX = 1800;
+            }
+
+            // リセットポジションへ移動;
+            sendMessage({
+              command: "navigate",
+              x: resetX,
+              y: 500,
+              degree: resetDegree,
+              theme: mode,
+            });
+
+            setTimeout(() => {
+              isOurCommand.current = false;
+            }, 200);
+          }, delayMs);
+        }, LounchDelay);
+      }, LounchDelay);
     }
   }, [realtimeStatus, sequenceState, mode, sendMessage]);
 

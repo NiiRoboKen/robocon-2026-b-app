@@ -4,12 +4,13 @@ import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
 import { getThemedX, getThemedDegree } from "../../controller";
 
-const TARGET_X = 3900;
-const TARGET_Y = 0;
-
 const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;
 const FIELD_WIDTH = 5700;
+
+// 青のときの狙い位置: フィールド右端(5700)からさらに右へ1800mm
+const TARGET_X = FIELD_WIDTH + 1800;
+const TARGET_Y = 0;
 const ANGLE_THRESHOLD = 2;
 const ARRIVAL_THRESHOLD = 50;
 const MAX_SHOOT_RANGE = 3500;
@@ -30,6 +31,20 @@ const calculateShootParams = (distanceMm: number) => {
   const time = Number(Math.sqrt((2 * RAIL_LENGTH) / actualA).toFixed(3));
 
   return { pwm, time };
+};
+
+// ロボットの相対位置から、フィールド上の絶対座標・角度を算出する
+// 赤陣地の基準X(1800)に移動量をそのまま足す。角度もロボット側の値をそのまま使う
+const getCurrentPose = (
+  status: { x: number; y: number; theta: number },
+  mode: string,
+) => {
+  const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
+  return {
+    x: baseOriginX + status.x,
+    y: ORIGIN_Y + status.y,
+    theta: status.theta,
+  };
 };
 
 const IntimidationButton = () => {
@@ -54,9 +69,7 @@ const IntimidationButton = () => {
       return;
     }
 
-    const currentX =
-      ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
-    const currentY = ORIGIN_Y + realtimeStatus.y;
+    const { x: currentX, y: currentY } = getCurrentPose(realtimeStatus, mode);
 
     const absoluteTargetX = getThemedX(TARGET_X, mode);
 
@@ -77,7 +90,12 @@ const IntimidationButton = () => {
     const dx = absoluteTargetX - destX;
     const dy = TARGET_Y - destY;
     const rawDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
-    const destDegree = getThemedDegree(rawDegree, mode);
+    let destDegree = getThemedDegree(rawDegree, mode);
+
+    // 赤陣地のときは角度を -90度 する(-180〜180度に正規化)
+    if (mode === "red") {
+      destDegree = ((destDegree - 90 + 540) % 360) - 180;
+    }
 
     setApproachPose({ x: destX, y: destY, degree: destDegree });
     isOurCommand.current = true;
@@ -108,11 +126,11 @@ const IntimidationButton = () => {
   useEffect(() => {
     if (sequenceState !== "approaching" || approachPose === null) return;
 
-    const currentX =
-      ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
-    const currentY = ORIGIN_Y + realtimeStatus.y;
-    const currentTheta =
-      mode === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
+    const {
+      x: currentX,
+      y: currentY,
+      theta: currentTheta,
+    } = getCurrentPose(realtimeStatus, mode);
 
     const distToApproach = Math.hypot(
       approachPose.x - currentX,
@@ -124,10 +142,7 @@ const IntimidationButton = () => {
     const isAngleMatched = Math.abs(diffDegree) < ANGLE_THRESHOLD;
 
     if (distToApproach < ARRIVAL_THRESHOLD && isAngleMatched) {
-      let absoluteTargetX = TARGET_X;
-      if (mode === "red") {
-        absoluteTargetX = FIELD_WIDTH - TARGET_X;
-      }
+      const absoluteTargetX = getThemedX(TARGET_X, mode);
 
       const actualDistToTarget = Math.hypot(
         absoluteTargetX - currentX,

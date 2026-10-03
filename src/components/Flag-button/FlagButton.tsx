@@ -42,7 +42,7 @@ export const FlagButton = () => {
     // 赤陣地モードの場合はX座標と角度を反転
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE; //ToDoフィールドで見てなおす
+      destDegree = -TARGET_DEGREE;
     }
 
     isOurCommand.current = true;
@@ -76,20 +76,24 @@ export const FlagButton = () => {
   useEffect(() => {
     if (sequenceState !== "moving_to_target") return;
 
-    // 現在の絶対座標を算出
-    const currentX =
-      ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
+    // 赤陣地の基準X座標（1800）を計算する
+    const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
+
+    // 反転せず、基準位置からの移動量をそのまま足す
+    const currentX = baseOriginX + realtimeStatus.x;
     const currentY = ORIGIN_Y + realtimeStatus.y;
-    const currentTheta =
-      mode === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
+
+    // 角度はロボット側で実態に合っているため、反転せずそのまま使用する
+    const currentTheta = realtimeStatus.theta;
 
     let destX = TARGET_X;
     let destDegree = TARGET_DEGREE;
 
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE;
+      destDegree = -TARGET_DEGREE;
     }
+
     // 目標地点との直線距離を計算
     const dx = currentX - destX;
     const dy = currentY - TARGET_Y;
@@ -104,6 +108,7 @@ export const FlagButton = () => {
     if (dist < ARRIVAL_THRESHOLD && isAngleMatched) {
       isOurCommand.current = true;
 
+      // 1回目の射出（到着直後）
       sendMessage({
         command: "shoot",
         pwm: shootPwm,
@@ -112,28 +117,41 @@ export const FlagButton = () => {
 
       setSequenceState("idle");
 
-      // 射出後少し待機して初期位置へ移動
-      const delayMs = Math.max(shootTime * 1000, 500) + 500;
+      // 2回目の射出
       setTimeout(() => {
-        let resetX = 3900;
-        const resetDegree = 0;
+        isOurCommand.current = true;
 
-        if (mode === "red") {
-          resetX = 1800;
-        }
-        //リセットポジションへ移動;
         sendMessage({
-          command: "navigate",
-          x: resetX,
-          y: 500,
-          degree: resetDegree,
-          theme: mode,
+          command: "shoot",
+          pwm: shootPwm,
+          time: shootTime,
         });
 
+        // 2回目の射出後少し待機して初期位置へ移動
+        const delayMs = Math.max(shootTime * 1000, 500) + 500;
         setTimeout(() => {
-          isOurCommand.current = false;
-        }, 200);
-      }, delayMs);
+          let resetX = 3900;
+          const resetDegree = 0;
+
+          // 赤陣地用のリセット位置を設定
+          if (mode === "red") {
+            resetX = 1800;
+          }
+
+          // リセットポジションへ移動
+          sendMessage({
+            command: "navigate",
+            x: resetX,
+            y: 500,
+            degree: resetDegree,
+            theme: mode,
+          });
+
+          setTimeout(() => {
+            isOurCommand.current = false;
+          }, 200);
+        }, delayMs);
+      }, 5000);
     }
   }, [realtimeStatus, sequenceState, mode, shootPwm, shootTime, sendMessage]);
 

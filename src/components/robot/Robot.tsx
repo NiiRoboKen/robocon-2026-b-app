@@ -12,22 +12,16 @@ type RobotProps = {
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
-export const Robot = ({ x, y, theta = 0, theme }: RobotProps) => {
+export const Robot = ({ x, y, theta = 0 }: RobotProps) => {
   const FIELD_WIDTH_MM = setting.fieldSize.width;
   const FIELD_HEIGHT_MM = setting.fieldSize.height;
 
   const displayWidth = setting.fieldSizeScale.width;
   const displayHeight = setting.fieldSizeScale.height;
 
-  let fieldX = clamp(x, 0, FIELD_WIDTH_MM);
+  // 親コンポーネントで反転済みの絶対座標が渡されるため、そのまま使用する
+  const fieldX = clamp(x, 0, FIELD_WIDTH_MM);
   const fieldY = clamp(y, 0, FIELD_HEIGHT_MM);
-
-  let displayTheta = theta;
-
-  if (theme === "red") {
-    fieldX = FIELD_WIDTH_MM - fieldX;
-    displayTheta = -theta;
-  }
 
   const px = (fieldX / FIELD_WIDTH_MM) * displayWidth;
   const py = displayHeight - (fieldY / FIELD_HEIGHT_MM) * displayHeight;
@@ -48,7 +42,8 @@ export const Robot = ({ x, y, theta = 0, theme }: RobotProps) => {
         top: py,
         width: robotWidthPx,
         height: robotHeightPx,
-        transform: `translate(-50%, -50%) rotate(${-displayTheta}deg)`,
+        // 角度も反転済みなので theta をそのまま使用する
+        transform: `translate(-50%, -50%) rotate(${-theta}deg)`,
         transformOrigin: "center center",
         background: "#00ff7f",
         boxSizing: "border-box",

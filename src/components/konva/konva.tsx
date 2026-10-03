@@ -14,7 +14,6 @@ import Konva from "konva";
 import { useModeStore } from "../../hooks/useController";
 import { ModeTheme, setting } from "../../controller";
 import { useWebSocket } from "../../websocket";
-import { getThemedX, getThemedDegree } from "../../controller";
 
 // 実フィールドの物理サイズ (mm)
 const REAL_FIELD_W = setting.fieldSize.width;
@@ -45,7 +44,7 @@ const CIRCLE_OBSTACLES = [
     radius: 3500,
   },
 ];
-// 旗から3500の位置の線 (物理座標)
+
 const SetLocation = () => {
   const { mode } = useModeStore();
   const colorTheme = ModeTheme[mode];
@@ -60,6 +59,7 @@ const SetLocation = () => {
     null,
   );
   const timeoutRef = useRef<number | null>(null);
+
   //タイマー初期化
   useEffect(() => {
     return () => {
@@ -100,31 +100,43 @@ const SetLocation = () => {
       setCurrentPos(pos);
     }
   };
-  // スクリーン座標と物理座標の変換
-  const toRealScaleX = REAL_FIELD_W / setting.fieldSizeScale.width;
-  const toRealScaleY = REAL_FIELD_H / setting.fieldSizeScale.height;
+
   // スクリーン座標とフィールドの物理座標変換
-  // Y軸は画面（下向き正）とフィールド（上向き正）で反転しているため補正
+  // スクリーン座標とフィールドの物理座標変換
   const toScreenScaleX = setting.fieldSizeScale.width / REAL_FIELD_W;
   const toScreenScaleY = setting.fieldSizeScale.height / REAL_FIELD_H;
+
+  // ★ 修正：赤モード時はオフセットを +200 に反転
+  const VISUAL_OFFSET_X = mode === "red" ? 200 : -200;
+  const VISUAL_OFFSET_Y = 50;
+
+  // ★ 修正：物理X座標 → 画面X座標への変換（赤陣地時の左右反転を含める）
+  const getScreenX = (physicalX: number) => {
+    const displayX = mode === "red" ? REAL_FIELD_W - physicalX : physicalX;
+    return (displayX + VISUAL_OFFSET_X) * toScreenScaleX;
+  };
+
+  const getScreenY = (physicalY: number) => {
+    return (REAL_FIELD_H - (physicalY + VISUAL_OFFSET_Y)) * toScreenScaleY;
+  };
 
   const handlePointerUp = () => {
     if (!startPos || !currentPos) return;
 
-    const rawRealX = startPos.x * toRealScaleX;
-    const realY = REAL_FIELD_H - startPos.y * toRealScaleY;
+    // ★ 修正：逆算時にも赤陣地の反転を考慮する
+    const displayX = startPos.x / toScreenScaleX - VISUAL_OFFSET_X;
+    const realX = mode === "red" ? REAL_FIELD_W - displayX : displayX;
+    const realY = REAL_FIELD_H - startPos.y / toScreenScaleY - VISUAL_OFFSET_Y;
+
     let targetDegree = 0;
-
-    // ドラッグ時ベクトル計算
     const dx = currentPos.x - startPos.x;
-    const dy = -(currentPos.y - startPos.y);
+    const dy = currentPos.y - startPos.y;
 
-    // 誤操作防止用（5px以上ドラッグした場合のみ角度を計算）
     if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-      const rawDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
-      targetDegree = getThemedDegree(rawDegree, mode);
+      // ★ ドラッグ角度の反転処理を復活させる
+      const rawDegree = Math.atan2(-dx, -dy) * (180 / Math.PI);
+      targetDegree = mode === "red" ? -rawDegree : rawDegree;
     }
-    const realX = getThemedX(rawRealX, mode);
 
     sendMessage({
       command: "navigate",
@@ -133,7 +145,7 @@ const SetLocation = () => {
       degree: Math.round(targetDegree),
       theme: mode,
     });
-    // 送信後、一定時間UI上に指示内容を残してから消去する
+
     timeoutRef.current = setTimeout(() => {
       setStartPos(null);
       setCurrentPos(null);
@@ -175,55 +187,46 @@ const SetLocation = () => {
           width={setting.fieldSizeScale.width}
           height={setting.fieldSizeScale.height}
         />
+
+        {/* NO_ENTRY_ZONES の描画 */}
         {NO_ENTRY_ZONES.map((zone, index) => {
-          const VISUAL_OFFSET_X = -200;
-          const VISUAL_OFFSET_Y = 50;
+          const screenX1 = getScreenX(zone.minX);
+          const screenX2 = getScreenX(zone.maxX);
 
-          const displayMinX = zone.minX + VISUAL_OFFSET_X;
-          const displayMaxX = zone.maxX + VISUAL_OFFSET_X;
-          const displayMinY = zone.minY + VISUAL_OFFSET_Y;
-          const displayMaxY = zone.maxY + VISUAL_OFFSET_Y;
+          const leftX = Math.min(screenX1, screenX2);
+          const width = Math.abs(screenX2 - screenX1);
 
-          let x = displayMinX;
-          const w = displayMaxX - displayMinX;
-          const h = displayMaxY - displayMinY;
+          const screenYTop = getScreenY(zone.maxY);
+          const screenYBottom = getScreenY(zone.minY);
+          const height = Math.abs(screenYBottom - screenYTop);
 
-          // 赤陣地の場合はX座標を反転 (右端の座標基準)
-          if (mode === "red") {
-            x = REAL_FIELD_W - zone.maxX;
-          }
-          const screenY = (REAL_FIELD_H - zone.maxY) * toScreenScaleY;
           return (
             <Rect
               key={index}
-              x={x * toScreenScaleX}
-              y={screenY}
-              width={w * toScreenScaleX}
-              height={h * toScreenScaleY}
-              fill="rgba(61, 61, 61, 0.4)" // 半透明の赤色
-              listening={false} // クリックイベントをブロックしない設定
+              x={leftX}
+              y={screenYTop}
+              width={width}
+              height={height}
+              fill="rgba(61, 61, 61, 0.4)"
+              listening={false}
             />
           );
         })}
 
-        {/* 線のみの円を描画 */}
+        {/* CIRCLE_OBSTACLES の描画 */}
         {CIRCLE_OBSTACLES.map((obstacle, index) => {
-          let x = obstacle.centerX;
-          if (mode === "red") {
-            // 赤陣地モードの場合中心座標も反転（左側）
-            x = REAL_FIELD_W - obstacle.centerX;
-          }
-          const screenY = (REAL_FIELD_H - obstacle.centerY) * toScreenScaleY;
+          const screenX = getScreenX(obstacle.centerX);
+          const screenY = getScreenY(obstacle.centerY);
           const screenRadius = obstacle.radius * toScreenScaleX;
 
           return (
             <Circle
               key={`circle-${index}`}
-              x={x * toScreenScaleX}
+              x={screenX}
               y={screenY}
               radius={screenRadius}
-              stroke="rgba(52, 49, 34, 0.8)" // 線の色
-              strokeWidth={3} // 線の太さ
+              stroke="rgba(52, 49, 34, 0.8)"
+              strokeWidth={3}
               listening={false}
             />
           );
@@ -247,40 +250,38 @@ const SetLocation = () => {
           closed
         />
 
+        {/* 水色矢印の描画 */}
         {(() => {
-          // 指定された物理座標 (mm) と角度
           const targetX = 4583.1;
           const targetY = 4938.9;
-          const targetTheta = 11.7; // θ=166.0°
+          const targetTheta = 11.7;
 
-          // 赤陣地モード時の座標反転
-          const displayX = getThemedX(targetX, mode);
-          const displayTheta = getThemedDegree(targetTheta, mode);
+          // ★ 修正：赤陣地モード時の見た目の角度反転
+          const displayTheta = mode === "red" ? targetTheta : targetTheta;
 
-          // 物理座標からスクリーン座標 (px) への変換
-          const screenX = displayX * toScreenScaleX;
-          const screenY = (REAL_FIELD_H - targetY) * toScreenScaleY;
-
-          // 矢印のスクリーン上の長さ(px)
+          const screenX = getScreenX(targetX);
+          const screenY = getScreenY(targetY);
           const arrowLength = 60;
 
-          // スクリーン座標系（Y軸下向き正）での終点計算
           const rad = (displayTheta * Math.PI) / 180;
-          const dx = Math.cos(rad) * arrowLength;
-          const dy = -Math.sin(rad) * arrowLength; // Y軸は下が正なのでマイナスにする
+          const dx =
+            mode === "red"
+              ? -Math.cos(rad) * arrowLength
+              : Math.cos(rad) * arrowLength;
+          const dy = -Math.sin(rad) * arrowLength;
 
           return (
             <Arrow
               x={screenX}
               y={screenY}
               points={[0, 0, dx, dy]}
-              stroke="#00FFFF" // 目立つようにシアン（水色）
+              stroke="#00FFFF"
               fill="#00FFFF"
               strokeWidth={4}
               pointerLength={10}
               pointerWidth={10}
               opacity={1.0}
-              listening={false} // クリックイベントの妨げにならないようにする
+              listening={false}
             />
           );
         })()}
@@ -295,21 +296,18 @@ const SetLocation = () => {
             );
 
             if (distance < 5) {
-              // タップ時は上向き（0度）の三角形のみを表示
               return (
                 <RegularPolygon
                   x={startPos.x}
                   y={startPos.y}
                   sides={3}
-                  radius={8} // 三角形の大きさ
+                  radius={8}
                   fill="#FFFF00"
                   opacity={0.8}
-                  // ※ Konvaの RegularPolygon(sides={3}) はデフォルトで真上を向きます
                 />
               );
             }
 
-            // ドラッグ時はこれまで通りの棒付き矢印
             return (
               <Arrow
                 points={getFixedArrowPoints()}
