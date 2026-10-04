@@ -3,7 +3,6 @@ import {
   Stage,
   Layer,
   Image,
-  Line,
   Arrow,
   Rect,
   Circle,
