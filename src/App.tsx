@@ -211,6 +211,7 @@ const App = () => {
             m={0}
             p={4}
             overflow="hidden"
+            overflowWrap="break-word"
           >
             {/* <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
@@ -226,13 +227,15 @@ const App = () => {
             <BeltoOutputSlider />
             <HStack flexWrap="wrap">
               <LaunchButton />
-              {/* <MoveAndLaunchButton /> */}
-              <LoadButton />
+            </HStack>
+            <LoadButton />
+
+            <HStack flexWrap="wrap">
               <FlagButton />
               <BucketButton />
               <IntimidationButton />
             </HStack>
-            {/* <Preset /> */}
+
             <ManualControl />
           </VStack>
         </HStack>

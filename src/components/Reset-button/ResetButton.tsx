@@ -1,4 +1,4 @@
-import { Button } from "../Button/Button";
+import { Button } from "@chakra-ui/react";
 import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
 
@@ -25,7 +25,14 @@ const ResetButton = ({ onReset }: ResetButtonProps) => {
   };
 
   return (
-    <Button onClick={handleResetClick} bg="#F8B400">
+    <Button
+      onClick={handleResetClick}
+      bg="#F8B400"
+      _active={{
+        transform: "translateY(3px)",
+      }}
+      rounded="3xl"
+    >
       リセットポジション
     </Button>
   );

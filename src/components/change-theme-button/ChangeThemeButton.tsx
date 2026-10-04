@@ -1,12 +1,11 @@
 import { useModeStore } from "../../hooks/useController.ts";
-import "./ChangeThemeButton.css";
-import { Button } from "../Button/Button.tsx";
+import { Button } from "@chakra-ui/react";
 
 const ChangeThemeButton = () => {
   const { toggleMode } = useModeStore.getState();
 
   return (
-    <Button className="change-theme-button" onClick={toggleMode}>
+    <Button onClick={toggleMode} color="white" bg="#00ff7f" rounded="3xl">
       Change Thema
     </Button>
   );

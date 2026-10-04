@@ -51,7 +51,7 @@ export const FlagButton = () => {
     // 赤陣地モードの場合はX座標と角度を反転
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = -TARGET_DEGREE;
+      destDegree = 180 - TARGET_DEGREE; //ToDoフィールドで見てなおす
     }
 
     isOurCommand.current = true;
@@ -87,24 +87,20 @@ export const FlagButton = () => {
   useEffect(() => {
     if (sequenceState !== "moving_to_target") return;
 
-    // 赤陣地の基準X座標（1800）を計算する
-    const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
-
-    // 反転せず、基準位置からの移動量をそのまま足す
-    const currentX = baseOriginX + realtimeStatus.x;
+    // 現在の絶対座標を算出
+    const currentX =
+      ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
     const currentY = ORIGIN_Y + realtimeStatus.y;
-
-    // 角度はロボット側で実態に合っているため、反転せずそのまま使用する
-    const currentTheta = realtimeStatus.theta;
+    const currentTheta =
+      mode === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
 
     let destX = TARGET_X;
     let destDegree = TARGET_DEGREE;
 
     if (mode === "red") {
       destX = FIELD_WIDTH - TARGET_X;
-      destDegree = -TARGET_DEGREE;
+      destDegree = 180 - TARGET_DEGREE;
     }
-
     // 目標地点との直線距離を計算
     const dx = currentX - destX;
     const dy = currentY - TARGET_Y;
@@ -119,7 +115,6 @@ export const FlagButton = () => {
     if (dist < ARRIVAL_THRESHOLD && isAngleMatched) {
       isOurCommand.current = true;
 
-      // 1回目の射出（到着直後）
       sendMessage({
         command: "shoot",
         pwm: shootPwm,
@@ -168,7 +163,7 @@ export const FlagButton = () => {
         onClick={handleClick}
         bg={sequenceState === "idle" ? "cyan.400" : "red.500"}
       >
-        {sequenceState === "idle" ? "移動&旗" : "キャンセル（実行中）"}
+        {sequenceState === "idle" ? "移動&旗" : "キャンセル"}
       </Button>
     </div>
   );
