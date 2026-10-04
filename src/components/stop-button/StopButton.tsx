@@ -1,16 +1,17 @@
 import { useWebSocket } from "../../websocket.ts";
 import "./StopButton.css";
+import { Button } from "../Button/Button";
 
 const { sendMessage } = useWebSocket.getState();
 
 const AllStopButton = () => {
   return (
-    <button
+    <Button
       className="StopButton"
       onClick={() => sendMessage({ command: "emergency_stop" })}
     >
       緊急停止
-    </button>
+    </Button>
   );
 };
 export default AllStopButton;

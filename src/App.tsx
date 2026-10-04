@@ -14,22 +14,21 @@ import {
 } from "@chakra-ui/react";
 
 import { BeltoOutputSlider } from "./components/Belt-output-slider/Belt-output-slider.tsx";
-import { Preset } from "./components/preset/Preset.tsx";
+// import { Preset } from "./components/preset/Preset.tsx";
+import { ManualControl } from "./components/manual-control/ManualControl.tsx";
 import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
 import AllStopButton from "./components/stop-button/StopButton.tsx";
 import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
 import { useModeStore } from "./hooks/useController.ts";
+import ResetButton from "./components/Reset-button/ResetButton.tsx";
+import { setting } from "./controller.ts";
+// import { MoveAndLaunchButton } from "./components/Move-and-launch-button/MoveAndLaunchButton.tsx";
+import { LoadButton } from "./components/Load-button/LoadButton.tsx";
+import { FlagButton } from "./components/Flag-button/FlagButton.tsx";
+import { BucketButton } from "./components/Bucket-Button/BucketButton.tsx";
+import IntimidationButton from "./components/Intimidation-button/IntimidationButton.tsx";
 
-type ThemeType = "blue" | "red";
-
-type Pose = {
-  x: number;
-  y: number;
-  theta: number;
-};
-
-const FIELD_W = 6000;
-const ORIGIN_X = 1800;
+const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;
 
 const App = () => {
@@ -39,24 +38,6 @@ const App = () => {
 
   const theme = mode as ThemeType;
 
-  const initialPose = useMemo<Pose>(() => {
-    if (theme === "blue") {
-      return {
-        x: ORIGIN_X,
-        y: ORIGIN_Y,
-        theta: 0,
-      };
-    }
-
-    return {
-      x: FIELD_W - ORIGIN_X,
-      y: ORIGIN_Y,
-      theta: 0,
-    };
-  }, [theme]);
-
-  const [pose, setPose] = useState<Pose>(initialPose);
-
   const fieldRef = useRef<HTMLDivElement>(null);
 
   const [fieldSize, setFieldSize] = useState({
@@ -64,13 +45,19 @@ const App = () => {
     h: 1,
   });
 
-  useEffect(() => {
-    setPose(initialPose);
-  }, [initialPose]);
+  const absolutePose = useMemo(() => {
+    // 原点は赤1800、青3900で正解
+    const baseOriginX =
+      theme === "red" ? setting.fieldSize.width - ORIGIN_X : ORIGIN_X;
+    return {
+      x: baseOriginX + realtimeStatus.x,
+      y: ORIGIN_Y + realtimeStatus.y,
+      theta: realtimeStatus.theta,
+    };
+  }, [realtimeStatus, theme]);
 
   useEffect(() => {
     connect();
-
     return () => {
       disconnect();
     };
@@ -78,12 +65,10 @@ const App = () => {
 
   useEffect(() => {
     const el = fieldRef.current;
-
     if (!el) return;
 
     const updateSize = () => {
       const rect = el.getBoundingClientRect();
-
       setFieldSize({
         w: rect.width,
         h: rect.height,
@@ -91,35 +76,61 @@ const App = () => {
     };
 
     updateSize();
-
     const observer = new ResizeObserver(updateSize);
-
     observer.observe(el);
 
     return () => {
       observer.disconnect();
     };
   }, []);
+  const FIELD_W_PX = setting.fieldSizeScale.width;
+  const FIELD_H_PX = setting.fieldSizeScale.height;
 
-  const displayCoord = useMemo(() => {
-    if (theme === "blue") {
+  // 枠に収まる倍率と、中央に寄せるための余白
+  const fieldScale = Math.min(
+    fieldSize.w / FIELD_W_PX,
+    fieldSize.h / FIELD_H_PX,
+  );
+  const offsetX = (fieldSize.w - FIELD_W_PX * fieldScale) / 2;
+  const offsetY = (fieldSize.h - FIELD_H_PX * fieldScale) / 2;
+
+  type ThemeType = "blue" | "red";
+
+  type Pose = {
+    x: number;
+    y: number;
+    theta: number;
+  };
+  const getInitialPose = (): Pose => {
+    if (theme === "red") {
       return {
-        x: pose.x - ORIGIN_X,
-        y: pose.y - ORIGIN_Y,
+        x: 1800,
+        y: 500,
+        theta: 0,
       };
     }
 
     return {
-      x: FIELD_W - pose.x - ORIGIN_X,
-      y: pose.y - ORIGIN_Y,
+      x: setting.fieldSize.width - 1800,
+      y: 500,
+      theta: 0,
     };
-  }, [pose, theme]);
+  };
+
+  const [pose, setPose] = useState<Pose>(getInitialPose);
+
+  const handleReset = () => {
+    setPose(getInitialPose());
+  };
 
   return (
     <ChakraProvider value={defaultSystem}>
       <Box
-        w="100vw"
-        h="100dvh"
+        position="fixed"
+        top={0}
+        left={0}
+        w="100%"
+        h="100%"
         m={0}
         p={0}
         overflow="hidden"
@@ -146,6 +157,18 @@ const App = () => {
             align="stretch"
             overflow="hidden"
           >
+            <Box p={2} borderBottom="1px solid" borderColor="gray.600">
+              <HStack>
+                <ChangeThemeButton />
+                <RobotCoordinate
+                  x={absolutePose.x} //実際の座標
+                  y={absolutePose.y}
+                  theta={absolutePose.theta}
+                  connected={status === "CONNECTING" && espConnecting}
+                />
+              </HStack>
+            </Box>
+
             <Box
               ref={fieldRef}
               flex="1"
@@ -156,19 +179,24 @@ const App = () => {
               m={0}
               p={0}
             >
-              <SetLocation />
+              <Box
+                position="absolute"
+                top={0}
+                left={0}
+                w={`${FIELD_W_PX}px`}
+                h={`${FIELD_H_PX}px`}
+                transformOrigin="top left"
+                transform={`translate(${offsetX}px, ${offsetY}px) scale(${fieldScale})`}
+              >
+                <SetLocation />
 
-              <Robot
-                x={pose.x}
-                y={pose.y}
-                theta={pose.theta}
-                theme={theme}
-                imageSrc={
-                  theme === "blue"
-                    ? "/fieldBlueImage.png"
-                    : "/fieldRedImage.png"
-                }
-              />
+                <Robot
+                  x={absolutePose.x + (theme === "red" ? 200 : -200)}
+                  y={absolutePose.y + 50}
+                  theta={absolutePose.theta}
+                  theme={theme}
+                />
+              </Box>
             </Box>
           </VStack>
 
@@ -184,20 +212,28 @@ const App = () => {
             p={4}
             overflow="hidden"
           >
-            <Box flexShrink={0} m={0} p={0}>
+            {/* <Box flexShrink={0} m={0} p={0}>
               <RobotCoordinate
-                x={realtimeStatus.x}
-                y={realtimeStatus.y}
-                theta={realtimeStatus.theta}
+                x={absolutePose.x} //実際の座標
+                y={absolutePose.y}
+                theta={absolutePose.theta}
                 connected={status === "CONNECTING" && espConnecting}
               />
-            </Box>
+            </Box>*/}
 
             <AllStopButton />
-            <ChangeThemeButton />
+            <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
-            <LaunchButton />
-            <Preset />
+            <HStack flexWrap="wrap">
+              <LaunchButton />
+              {/* <MoveAndLaunchButton /> */}
+              <LoadButton />
+              <FlagButton />
+              <BucketButton />
+              <IntimidationButton />
+            </HStack>
+            {/* <Preset /> */}
+            <ManualControl />
           </VStack>
         </HStack>
       </Box>
