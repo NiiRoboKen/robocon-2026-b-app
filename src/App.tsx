@@ -188,18 +188,6 @@ const App = () => {
                 transformOrigin="top left"
                 transform={`translate(${offsetX}px, ${offsetY}px) scale(${fieldScale})`}
               >
-                <Box
-                  position="absolute"
-                  top={0}
-                  right={0}
-                  zIndex={10}
-                  bg="blackAlpha.700"
-                  color="white"
-                  fontSize="xs"
-                  p={1}
-                >
-                  {`枠 ${Math.round(fieldSize.w)}x${Math.round(fieldSize.h)} / 地図 ${FIELD_W_PX}x${FIELD_H_PX} / 倍率 ${fieldScale.toFixed(3)}`}
-                </Box>
                 <SetLocation />
 
                 <Robot
