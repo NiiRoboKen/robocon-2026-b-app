@@ -16,6 +16,7 @@ const AllStopButton = () => {
       }}
       onClick={() => sendMessage({ command: "emergency_stop" })}
       rounded="3xl"
+      fontSize="2xl"
     >
       緊急停止
     </Button>
