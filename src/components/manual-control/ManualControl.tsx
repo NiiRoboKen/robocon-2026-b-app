@@ -21,6 +21,7 @@ export const ManualControl = () => {
     let vx = 0,
       vy = 0,
       vtheta = 0;
+
     switch (direction) {
       case "up":
         vx = pwm;
@@ -45,6 +46,7 @@ export const ManualControl = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     const send = () => sendMessage({ command: "manual_move", vx, vy, vtheta });
+
     send();
     intervalRef.current = setInterval(send, 100);
   };
@@ -53,7 +55,12 @@ export const ManualControl = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
-      sendMessage({ command: "manual_move", vx: 0, vy: 0, vtheta: 0 });
+      sendMessage({
+        command: "manual_move",
+        vx: 0,
+        vy: 0,
+        vtheta: 0,
+      });
     }
   };
 
@@ -71,7 +78,10 @@ export const ManualControl = () => {
       e.preventDefault();
       stopMove();
     },
-    style: { userSelect: "none" as const, touchAction: "none" as const },
+    style: {
+      userSelect: "none" as const,
+      touchAction: "none" as const,
+    },
   });
 
   return (
@@ -87,6 +97,7 @@ export const ManualControl = () => {
           <Text fontSize="sm" fontWeight="bold" mb={6}>
             PWM
           </Text>
+
           <Slider.Root
             defaultValue={[200]}
             min={100}
@@ -99,6 +110,7 @@ export const ManualControl = () => {
               <Slider.Track>
                 <Slider.Range />
               </Slider.Track>
+
               <Slider.Thumb index={0}>
                 <Slider.ValueText
                   position="absolute"
@@ -115,13 +127,21 @@ export const ManualControl = () => {
 
         <Grid templateColumns="repeat(3, 1fr)" gap={2} w="300px">
           <GridItem colStart={2}>
-            <Button w="100%" bg="blue.500" color="white" {...bindEvents("up")}>
+            <Button
+              w="100%"
+              h="60px"
+              bg="blue.500"
+              color="white"
+              {...bindEvents("up")}
+            >
               前
             </Button>
           </GridItem>
+
           <GridItem colStart={1} rowStart={2}>
             <Button
               w="100%"
+              h="60px"
               bg="blue.500"
               color="white"
               {...bindEvents("left")}
@@ -129,9 +149,11 @@ export const ManualControl = () => {
               左
             </Button>
           </GridItem>
+
           <GridItem colStart={2} rowStart={3}>
             <Button
               w="100%"
+              h="60px"
               bg="blue.500"
               color="white"
               {...bindEvents("down")}
@@ -139,9 +161,11 @@ export const ManualControl = () => {
               後
             </Button>
           </GridItem>
+
           <GridItem colStart={3} rowStart={2}>
             <Button
               w="100%"
+              h="60px"
               bg="blue.500"
               color="white"
               {...bindEvents("right")}
@@ -149,9 +173,11 @@ export const ManualControl = () => {
               右
             </Button>
           </GridItem>
+
           <GridItem colStart={1} rowStart={1}>
             <Button
               w="100%"
+              h="60px"
               bg="yellow.500"
               color="white"
               {...bindEvents("ccw")}
@@ -159,9 +185,11 @@ export const ManualControl = () => {
               左回転
             </Button>
           </GridItem>
+
           <GridItem colStart={3} rowStart={1}>
             <Button
               w="100%"
+              h="60px"
               bg="yellow.500"
               color="white"
               {...bindEvents("cw")}

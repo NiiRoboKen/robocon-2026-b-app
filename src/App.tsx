@@ -227,15 +227,15 @@ const App = () => {
             <BeltoOutputSlider />
             <HStack flexWrap="wrap">
               <LaunchButton />
+            </HStack>
+            <LoadButton />
 
-              {/* <MoveAndLaunchButton /> */}
-
-              <LoadButton />
+            <HStack flexWrap="wrap">
               <FlagButton />
               <BucketButton />
               <IntimidationButton />
             </HStack>
-            {/* <Preset /> */}
+
             <ManualControl />
           </VStack>
         </HStack>

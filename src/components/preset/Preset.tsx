@@ -13,8 +13,8 @@ import { useWebSocket } from "../../websocket";
 export const Preset = () => {
   const [distance, setDistance] = useState(100);
   const [angleStep, setAngleStep] = useState(15);
-
   const { sendMessage } = useWebSocket();
+
   const handleMove = (direction: "up" | "down" | "left" | "right" | "stop") => {
     let moveX = 0;
     let moveY = 0;
@@ -37,6 +37,7 @@ export const Preset = () => {
         moveY = 0;
         break;
     }
+
     sendMessage({
       command: "set_location",
       x: moveX,
@@ -68,6 +69,7 @@ export const Preset = () => {
         <Text fontSize="sm" fontWeight="bold" mb={8}>
           移動距離 (mm)
         </Text>
+
         <Slider.Root
           defaultValue={[100]}
           min={10}
@@ -80,6 +82,7 @@ export const Preset = () => {
             <Slider.Track>
               <Slider.Range />
             </Slider.Track>
+
             <Slider.Thumb index={0}>
               <Slider.ValueText
                 position="absolute"
@@ -98,6 +101,7 @@ export const Preset = () => {
         <Text fontSize="sm" fontWeight="bold" mb={8}>
           回転角度 (度)
         </Text>
+
         <Slider.Root
           value={[angleStep]}
           min={3}
@@ -110,6 +114,7 @@ export const Preset = () => {
             <Slider.Track>
               <Slider.Range />
             </Slider.Track>
+
             <Slider.Thumb index={0}>
               <Slider.ValueText
                 position="absolute"
@@ -126,11 +131,10 @@ export const Preset = () => {
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={8}>
         <VStack gap={3} w="100%" maxW="240px">
-          {/* 回転 */}
           <Grid templateColumns="repeat(3, minmax(0, 1fr))" gap={2} w="100%">
             <Button
               w="100%"
-              h="50px"
+              h="60px"
               bg="yellow.500"
               color="white"
               onClick={() => handleRotate("ccw")}
@@ -145,7 +149,7 @@ export const Preset = () => {
 
             <Button
               w="100%"
-              h="50px"
+              h="60px"
               bg="yellow.500"
               color="white"
               onClick={() => handleRotate("cw")}
@@ -161,7 +165,7 @@ export const Preset = () => {
             <GridItem colStart={2}>
               <Button
                 w="100%"
-                h="50px"
+                h="60px"
                 bg="blue.500"
                 color="white"
                 onClick={() => handleMove("up")}
@@ -176,7 +180,7 @@ export const Preset = () => {
             <GridItem colStart={1} rowStart={2}>
               <Button
                 w="100%"
-                h="50px"
+                h="60px"
                 bg="blue.500"
                 color="white"
                 onClick={() => handleMove("left")}
@@ -191,7 +195,7 @@ export const Preset = () => {
             <GridItem colStart={3} rowStart={2}>
               <Button
                 w="100%"
-                h="50px"
+                h="60px"
                 bg="blue.500"
                 color="white"
                 onClick={() => handleMove("right")}
@@ -206,7 +210,7 @@ export const Preset = () => {
             <GridItem colStart={2} rowStart={3}>
               <Button
                 w="100%"
-                h="50px"
+                h="60px"
                 bg="blue.500"
                 color="white"
                 onClick={() => handleMove("down")}
@@ -221,7 +225,7 @@ export const Preset = () => {
             <GridItem colStart={2} rowStart={2}>
               <Button
                 w="100%"
-                h="50px"
+                h="60px"
                 bg="red.500"
                 color="white"
                 onClick={() => handleMove("stop")}
