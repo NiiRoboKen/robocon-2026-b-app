@@ -27,7 +27,7 @@ const calculateShootParams = (distanceMm: number) => {
   let pwm = Math.round((requiredA + 14.62) / 0.0198);
   pwm = Math.min(2999, Math.max(0, pwm));
 
-  const actualA = 0.0198 * pwm - 14.62;
+  const actualA = 0.0168 * pwm - 14.62;
   const time = Number(Math.sqrt((2 * RAIL_LENGTH) / actualA).toFixed(3));
 
   return { pwm, time };

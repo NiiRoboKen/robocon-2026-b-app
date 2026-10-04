@@ -6,7 +6,7 @@ import { useController, useModeStore } from "../../hooks/useController";
 // 目標地点の物理座標 (mm) と到着判定の閾値
 const TARGET_X = 4447;
 const TARGET_Y = 4866;
-const TARGET_DEGREE = -85.89;
+const TARGET_DEGREE = -75.89;
 const ARRIVAL_THRESHOLD = 50;
 const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
 
@@ -20,19 +20,28 @@ export const FlagButton = () => {
   const { shootPwm, shootTime } = useController();
   const { mode } = useModeStore();
 
-  //進行状況管理
+  // 進行状況管理に「shooting（射出・帰還中）」を追加
   const [sequenceState, setSequenceState] = useState<
-    "idle" | "moving_to_target"
+    "idle" | "moving_to_target" | "shooting"
   >("idle");
 
   const isOurCommand = useRef(false);
+  // 発行したsetTimeoutのIDを保持する配列
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+
+  // 保持しているすべてのタイマーを破棄する関数
+  const clearAllTimeouts = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  };
 
   // ボタンクリック時
   const handleClick = () => {
-    // 移動中の場合緊急停止コマンドを発行
-    if (sequenceState === "moving_to_target") {
+    // 移動中・射出中の場合、緊急停止コマンドを発行してシーケンスを完全破棄
+    if (sequenceState !== "idle") {
       sendMessage({ command: "emergency_stop" });
       setSequenceState("idle");
+      clearAllTimeouts();
       return;
     }
 
@@ -65,11 +74,13 @@ export const FlagButton = () => {
 
   // コマンド介入監視
   useEffect(() => {
-    if (sequenceState !== "moving_to_target") return;
+    if (sequenceState === "idle") return;
     if (!lastCommand) return;
     if (isOurCommand.current) return;
-    // 他操作時中断
+
+    // 他操作時、タイマーを破棄して中断
     setSequenceState("idle");
+    clearAllTimeouts();
   }, [lastCommand, sequenceState]);
 
   // 自己位置の監視と到達判定・射出シーケンス
@@ -115,43 +126,39 @@ export const FlagButton = () => {
         time: shootTime,
       });
 
-      setSequenceState("idle");
+      // 状態を「shooting」に変更（アイドルには戻さない）
+      setSequenceState("shooting");
 
-      // 2回目の射出
-      setTimeout(() => {
+      // 射出後少し待機して初期位置へ移動
+      const delayMs = Math.max(shootTime * 1000, 500) + 500;
+      const t1 = setTimeout(() => {
+        let resetX = 3850;
+        const resetDegree = 0;
+
+        // 赤陣地用のリセット位置を設定
+        if (mode === "red") {
+          resetX = 1850;
+        }
+
         isOurCommand.current = true;
-
+        // リセットポジションへ移動
         sendMessage({
-          command: "shoot",
-          pwm: shootPwm,
-          time: shootTime,
+          command: "navigate",
+          x: resetX,
+          y: 500,
+          degree: resetDegree,
+          theme: mode,
         });
 
-        // 2回目の射出後少し待機して初期位置へ移動
-        const delayMs = Math.max(shootTime * 1000, 500) + 500;
+        // 移動コマンドを発行して初めてシーケンス完了
+        setSequenceState("idle");
+
         setTimeout(() => {
-          let resetX = 3900;
-          const resetDegree = 0;
+          isOurCommand.current = false;
+        }, 200);
+      }, delayMs);
 
-          // 赤陣地用のリセット位置を設定
-          if (mode === "red") {
-            resetX = 1800;
-          }
-
-          // リセットポジションへ移動
-          sendMessage({
-            command: "navigate",
-            x: resetX,
-            y: 500,
-            degree: resetDegree,
-            theme: mode,
-          });
-
-          setTimeout(() => {
-            isOurCommand.current = false;
-          }, 200);
-        }, delayMs);
-      }, 5000);
+      timeoutsRef.current.push(t1);
     }
   }, [realtimeStatus, sequenceState, mode, shootPwm, shootTime, sendMessage]);
 
@@ -161,7 +168,7 @@ export const FlagButton = () => {
         onClick={handleClick}
         bg={sequenceState === "idle" ? "cyan.400" : "red.500"}
       >
-        {sequenceState === "idle" ? "移動&旗" : "キャンセル（移動中）"}
+        {sequenceState === "idle" ? "移動&旗" : "キャンセル（実行中）"}
       </Button>
     </div>
   );
