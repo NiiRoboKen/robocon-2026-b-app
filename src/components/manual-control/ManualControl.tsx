@@ -84,11 +84,11 @@ export const ManualControl = () => {
         gap={6}
       >
         <Box w="100%" maxW="300px">
-          <Text fontSize="sm" fontWeight="bold" mb={2}>
+          <Text fontSize="sm" fontWeight="bold" mb={6}>
             PWM
           </Text>
           <Slider.Root
-            defaultValue={[500]}
+            defaultValue={[200]}
             min={100}
             max={1000}
             step={10}
