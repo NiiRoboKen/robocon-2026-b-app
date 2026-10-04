@@ -83,6 +83,16 @@ const App = () => {
       observer.disconnect();
     };
   }, []);
+  const FIELD_W_PX = setting.fieldSizeScale.width;
+  const FIELD_H_PX = setting.fieldSizeScale.height;
+
+  // 枠に収まる倍率と、中央に寄せるための余白
+  const fieldScale = Math.min(
+    fieldSize.w / FIELD_W_PX,
+    fieldSize.h / FIELD_H_PX,
+  );
+  const offsetX = (fieldSize.w - FIELD_W_PX * fieldScale) / 2;
+  const offsetY = (fieldSize.h - FIELD_H_PX * fieldScale) / 2;
 
   type ThemeType = "blue" | "red";
 
@@ -116,8 +126,11 @@ const App = () => {
   return (
     <ChakraProvider value={defaultSystem}>
       <Box
-        w="100vw"
-        h="100dvh"
+        position="fixed"
+        top={0}
+        left={0}
+        w="100%"
+        h="100%"
         m={0}
         p={0}
         overflow="hidden"
@@ -166,14 +179,36 @@ const App = () => {
               m={0}
               p={0}
             >
-              <SetLocation />
+              <Box
+                position="absolute"
+                top={0}
+                left={0}
+                w={`${FIELD_W_PX}px`}
+                h={`${FIELD_H_PX}px`}
+                transformOrigin="top left"
+                transform={`translate(${offsetX}px, ${offsetY}px) scale(${fieldScale})`}
+              >
+                <Box
+                  position="absolute"
+                  top={0}
+                  right={0}
+                  zIndex={10}
+                  bg="blackAlpha.700"
+                  color="white"
+                  fontSize="xs"
+                  p={1}
+                >
+                  {`枠 ${Math.round(fieldSize.w)}x${Math.round(fieldSize.h)} / 地図 ${FIELD_W_PX}x${FIELD_H_PX} / 倍率 ${fieldScale.toFixed(3)}`}
+                </Box>
+                <SetLocation />
 
-              <Robot
-                x={absolutePose.x + (theme === "red" ? 200 : -200)}
-                y={absolutePose.y + 50}
-                theta={absolutePose.theta}
-                theme={theme}
-              />
+                <Robot
+                  x={absolutePose.x + (theme === "red" ? 200 : -200)}
+                  y={absolutePose.y + 50}
+                  theta={absolutePose.theta}
+                  theme={theme}
+                />
+              </Box>
             </Box>
           </VStack>
 
