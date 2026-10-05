@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 import SetLocation from "./components/konva/konva.tsx";
 import { Robot } from "./components/robot/Robot.tsx";
 import { RobotCoordinate } from "./components/robot-coordinate/RobotCoordinate.tsx";
@@ -28,33 +27,18 @@ import { FlagButton } from "./components/Flag-button/FlagButton.tsx";
 import { BucketButton } from "./components/Bucket-Button/BucketButton.tsx";
 import IntimidationButton from "./components/Intimidation-button/IntimidationButton.tsx";
 
-const ORIGIN_X = 3900;
-const ORIGIN_Y = 500;
-
 const App = () => {
-  const { connect, disconnect, realtimeStatus, status, espConnecting } =
-    useWebSocket();
-  const { mode } = useModeStore();
+  // セレクターを使って個別に取得
+  const connect = useWebSocket((state) => state.connect);
+  const disconnect = useWebSocket((state) => state.disconnect);
+  const status = useWebSocket((state) => state.status);
+  const espConnecting = useWebSocket((state) => state.espConnecting);
 
-  const theme = mode as ThemeType;
+  const mode = useModeStore((state) => state.mode);
+  const theme = mode as "blue" | "red";
 
   const fieldRef = useRef<HTMLDivElement>(null);
-
-  const [fieldSize, setFieldSize] = useState({
-    w: 1,
-    h: 1,
-  });
-
-  const absolutePose = useMemo(() => {
-    // 原点は赤1800、青3900で正解
-    const baseOriginX =
-      theme === "red" ? setting.fieldSize.width - ORIGIN_X : ORIGIN_X;
-    return {
-      x: baseOriginX + realtimeStatus.x,
-      y: ORIGIN_Y + realtimeStatus.y,
-      theta: realtimeStatus.theta,
-    };
-  }, [realtimeStatus, theme]);
+  const [fieldSize, setFieldSize] = useState({ w: 1, h: 1 });
 
   useEffect(() => {
     connect();
@@ -69,10 +53,7 @@ const App = () => {
 
     const updateSize = () => {
       const rect = el.getBoundingClientRect();
-      setFieldSize({
-        w: rect.width,
-        h: rect.height,
-      });
+      setFieldSize({ w: rect.width, h: rect.height });
     };
 
     updateSize();
@@ -94,33 +75,8 @@ const App = () => {
   const offsetX = (fieldSize.w - FIELD_W_PX * fieldScale) / 2;
   const offsetY = (fieldSize.h - FIELD_H_PX * fieldScale) / 2;
 
-  type ThemeType = "blue" | "red";
-
-  type Pose = {
-    x: number;
-    y: number;
-    theta: number;
-  };
-  const getInitialPose = (): Pose => {
-    if (theme === "red") {
-      return {
-        x: 1800,
-        y: 500,
-        theta: 0,
-      };
-    }
-
-    return {
-      x: setting.fieldSize.width - 1800,
-      y: 500,
-      theta: 0,
-    };
-  };
-
-  const [pose, setPose] = useState<Pose>(getInitialPose);
-
   const handleReset = () => {
-    setPose(getInitialPose());
+    // Poseのリセット等の処理（もしあれば）
   };
 
   return (
@@ -160,10 +116,8 @@ const App = () => {
             <Box p={2} borderBottom="1px solid" borderColor="gray.600">
               <HStack>
                 <ChangeThemeButton />
+                {/* 座標やrealtimeStatusは子コンポーネント内で直接取得 */}
                 <RobotCoordinate
-                  x={absolutePose.x} //実際の座標
-                  y={absolutePose.y}
-                  theta={absolutePose.theta}
                   connected={status === "CONNECTING" && espConnecting}
                 />
               </HStack>
@@ -189,13 +143,8 @@ const App = () => {
                 transform={`translate(${offsetX}px, ${offsetY}px) scale(${fieldScale})`}
               >
                 <SetLocation />
-
-                <Robot
-                  x={absolutePose.x + (theme === "red" ? 200 : -200)}
-                  y={absolutePose.y + 50}
-                  theta={absolutePose.theta}
-                  theme={theme}
-                />
+                {/* 座標計算は内部で行う */}
+                <Robot theme={theme} />
               </Box>
             </Box>
           </VStack>
@@ -213,15 +162,6 @@ const App = () => {
             overflow="hidden"
             overflowWrap="break-word"
           >
-            {/* <Box flexShrink={0} m={0} p={0}>
-              <RobotCoordinate
-                x={absolutePose.x} //実際の座標
-                y={absolutePose.y}
-                theta={absolutePose.theta}
-                connected={status === "CONNECTING" && espConnecting}
-              />
-            </Box>*/}
-
             <AllStopButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
