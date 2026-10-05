@@ -6,7 +6,7 @@ import { useController, useModeStore } from "../../hooks/useController";
 // 目標地点の物理座標 (mm) と到着判定の閾値
 const TARGET_X = 4447;
 const TARGET_Y = 4866;
-const TARGET_DEGREE = -85.89;
+const TARGET_DEGREE = -75.89;
 const ARRIVAL_THRESHOLD = 50;
 const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
 
@@ -20,122 +20,158 @@ export const FlagButton = () => {
   const { shootPwm, shootTime } = useController();
   const { mode } = useModeStore();
 
-  //進行状況管理
+  // 進行状況管理に「shooting（射出・帰還中）」を追加
   const [sequenceState, setSequenceState] = useState<
-    "idle" | "moving_to_target"
+    "idle" | "moving_to_target" | "shooting"
   >("idle");
 
+  const abortControllerRef = useRef<AbortController | null>(null);
   const isOurCommand = useRef(false);
 
-  // ボタンクリック時
-  const handleClick = () => {
-    // 移動中の場合緊急停止コマンドを発行
-    if (sequenceState === "moving_to_target") {
-      sendMessage({ command: "emergency_stop" });
-      setSequenceState("idle");
-      return;
-    }
+  // 非同期ループ内で最新の座標を参照するためのRef
+  const realtimeStatusRef = useRef(realtimeStatus);
+  useEffect(() => {
+    realtimeStatusRef.current = realtimeStatus;
+  }, [realtimeStatus]);
 
-    let destX = TARGET_X;
-    let destDegree = TARGET_DEGREE;
+  // 他のコマンド介入時の強制キャンセル監視
+  useEffect(() => {
+    if (sequenceState === "idle") return;
+    if (!lastCommand) return;
+    if (isOurCommand.current) return;
 
-    // 赤陣地モードの場合はX座標と角度を反転
-    if (mode === "red") {
-      destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE; //ToDoフィールドで見てなおす
-    }
+    abortControllerRef.current?.abort();
+  }, [lastCommand, sequenceState]);
 
-    isOurCommand.current = true;
-    setSequenceState("moving_to_target");
-
-    // 目標座標への移動コマンドを送信
-    sendMessage({
-      command: "navigate",
-      x: destX,
-      y: TARGET_Y,
-      degree: destDegree,
-      theme: mode,
+  // 非同期用の安全な待機関数
+  const sleep = (ms: number, signal: AbortSignal) => {
+    return new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(resolve, ms);
+      signal.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(timer);
+          reject(new DOMException("Aborted", "AbortError"));
+        },
+        { once: true },
+      );
     });
+  };
 
-    //コマンド発行フラグをリセット;
+  // 自身が発行したコマンドで監視が誤発火しないようフラグを制御するラッパー
+  const sendCommandSafe = (cmd: Parameters<typeof sendMessage>[0]) => {
+    isOurCommand.current = true;
+    sendMessage(cmd);
     setTimeout(() => {
       isOurCommand.current = false;
     }, 200);
   };
 
-  // コマンド介入監視
-  useEffect(() => {
-    if (sequenceState !== "moving_to_target") return;
-    if (!lastCommand) return;
-    if (isOurCommand.current) return;
-    // 他操作時中断
-    setSequenceState("idle");
-  }, [lastCommand, sequenceState]);
+  // 目標到達までポーリング待機する関数
+  const waitForArrival = async (
+    targetX: number,
+    targetY: number,
+    targetDegree: number,
+    signal: AbortSignal,
+  ) => {
+    return new Promise<void>((resolve, reject) => {
+      const checkInterval = setInterval(() => {
+        if (signal.aborted) {
+          clearInterval(checkInterval);
+          reject(new DOMException("Aborted", "AbortError"));
+          return;
+        }
 
-  // 自己位置の監視と到達判定・射出シーケンス
-  useEffect(() => {
-    if (sequenceState !== "moving_to_target") return;
+        const status = realtimeStatusRef.current;
+        const currentX = ORIGIN_X + (mode === "red" ? -status.x : status.x);
+        const currentY = ORIGIN_Y + status.y;
+        const currentTheta = mode === "red" ? -status.theta : status.theta;
 
-    // 現在の絶対座標を算出
-    const currentX =
-      ORIGIN_X + (mode === "red" ? -realtimeStatus.x : realtimeStatus.x);
-    const currentY = ORIGIN_Y + realtimeStatus.y;
-    const currentTheta =
-      mode === "red" ? -realtimeStatus.theta : realtimeStatus.theta;
+        const dist = Math.hypot(currentX - targetX, currentY - targetY);
+        let diffDegree = currentTheta - targetDegree;
+        diffDegree = ((diffDegree + 540) % 360) - 180;
 
-    let destX = TARGET_X;
-    let destDegree = TARGET_DEGREE;
+        if (
+          dist < ARRIVAL_THRESHOLD &&
+          Math.abs(diffDegree) < ANGLE_THRESHOLD
+        ) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
 
-    if (mode === "red") {
-      destX = FIELD_WIDTH - TARGET_X;
-      destDegree = 180 - TARGET_DEGREE;
-    }
-    // 目標地点との直線距離を計算
-    const dx = currentX - destX;
-    const dy = currentY - TARGET_Y;
-    const dist = Math.hypot(dx, dy);
+      signal.addEventListener(
+        "abort",
+        () => {
+          clearInterval(checkInterval);
+          reject(new DOMException("Aborted", "AbortError"));
+        },
+        { once: true },
+      );
+    });
+  };
 
-    // 目標角度との差を計算 (-180〜180度の範囲に正規化)
-    let diffDegree = currentTheta - destDegree;
-    diffDegree = ((diffDegree + 540) % 360) - 180;
-    const isAngleMatched = Math.abs(diffDegree) < ANGLE_THRESHOLD;
+  const executeSequence = async () => {
+    abortControllerRef.current?.abort();
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    const signal = abortController.signal;
 
-    // 射出コマンドの送信
-    if (dist < ARRIVAL_THRESHOLD && isAngleMatched) {
-      isOurCommand.current = true;
+    try {
+      let destX = TARGET_X;
+      let destDegree = TARGET_DEGREE;
 
-      sendMessage({
+      if (mode === "red") {
+        destX = FIELD_WIDTH - TARGET_X;
+        destDegree = 180 - TARGET_DEGREE;
+      }
+
+      setSequenceState("moving_to_target");
+      sendCommandSafe({
+        command: "navigate",
+        x: destX,
+        y: TARGET_Y,
+        degree: destDegree,
+        theme: mode,
+      });
+
+      await waitForArrival(destX, TARGET_Y, destDegree, signal);
+
+      setSequenceState("shooting");
+      sendCommandSafe({
         command: "shoot",
         pwm: shootPwm,
         time: shootTime,
       });
 
-      setSequenceState("idle");
-
-      // 射出後少し待機して初期位置へ移動
       const delayMs = Math.max(shootTime * 1000, 500) + 500;
-      setTimeout(() => {
-        let resetX = 3900;
-        const resetDegree = 0;
+      await sleep(delayMs, signal);
 
-        if (mode === "red") {
-          resetX = 1800;
-        }
-        //リセットポジションへ移動;
-        sendMessage({
-          command: "navigate",
-          x: resetX,
-          y: 500,
-          degree: resetDegree,
-          theme: mode,
-        });
+      const resetX = mode === "red" ? 1850 : 3850;
+      sendCommandSafe({
+        command: "navigate",
+        x: resetX,
+        y: 500,
+        degree: 0,
+        theme: mode,
+      });
 
-        setTimeout(() => {
-          isOurCommand.current = false;
-        }, 200);
-      }, delayMs);
+      setSequenceState("idle");
+    } catch {
+      // AbortError等で中断された場合はステートを戻して終了
+      setSequenceState("idle");
     }
-  }, [realtimeStatus, sequenceState, mode, shootPwm, shootTime, sendMessage]);
+  };
+
+  const handleClick = () => {
+    if (sequenceState !== "idle") {
+      sendMessage({ command: "emergency_stop" });
+      abortControllerRef.current?.abort();
+      setSequenceState("idle");
+      return;
+    }
+    executeSequence();
+  };
 
   return (
     <div>
