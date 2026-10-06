@@ -14,7 +14,7 @@ const ResetButton = ({ onReset }: ResetButtonProps) => {
   // 初期位置に移動
   const handleResetClick = () => {
     onReset();
-    const resetX = mode === "red" ? 1801 : 3900;
+    const resetX = mode === "red" ? 1850 : 3850;
     sendMessage({
       command: "navigate",
       x: resetX,
