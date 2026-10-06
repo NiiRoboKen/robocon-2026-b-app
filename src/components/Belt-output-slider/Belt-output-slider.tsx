@@ -42,8 +42,8 @@ export const BeltoOutputSlider = () => {
         width="300px"
         defaultValue={[shootTime]}
         min={0.005}
-        max={0.4}
-        step={0.005}
+        max={0.35}
+        step={0.001}
         onValueChangeEnd={(e) => setShootTime(e.value[0])}
         colorPalette="green"
       >
