@@ -73,8 +73,11 @@ export const FlagButton = () => {
     targetY: number,
     targetDegree: number,
     signal: AbortSignal,
+    timeoutMs: number = 15000,
   ) => {
     return new Promise<void>((resolve, reject) => {
+      const startTime = Date.now();
+
       const checkInterval = setInterval(() => {
         if (signal.aborted) {
           clearInterval(checkInterval);
@@ -82,10 +85,17 @@ export const FlagButton = () => {
           return;
         }
 
+        if (Date.now() - startTime > timeoutMs) {
+          clearInterval(checkInterval);
+          reject(new Error("Timeout waiting for arrival"));
+          return;
+        }
+
         const status = realtimeStatusRef.current;
-        const currentX = ORIGIN_X + (mode === "red" ? -status.x : status.x);
+        const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
+        const currentX = baseOriginX - status.x;
         const currentY = ORIGIN_Y + status.y;
-        const currentTheta = mode === "red" ? -status.theta : status.theta;
+        const currentTheta = status.theta;
 
         const dist = Math.hypot(currentX - targetX, currentY - targetY);
         let diffDegree = currentTheta - targetDegree;
@@ -123,7 +133,7 @@ export const FlagButton = () => {
 
       if (mode === "red") {
         destX = FIELD_WIDTH - TARGET_X;
-        destDegree = 180 - TARGET_DEGREE;
+        destDegree = -TARGET_DEGREE;
       }
 
       setSequenceState("moving_to_target");

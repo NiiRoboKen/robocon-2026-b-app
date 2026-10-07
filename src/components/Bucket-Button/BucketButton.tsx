@@ -67,8 +67,10 @@ export const BucketButton = () => {
     targetY: number,
     targetDegree: number,
     signal: AbortSignal,
+    timeoutMs: number = 15000,
   ) => {
     return new Promise<void>((resolve, reject) => {
+      const startTime = Date.now();
       const checkInterval = setInterval(() => {
         if (signal.aborted) {
           clearInterval(checkInterval);
@@ -76,13 +78,20 @@ export const BucketButton = () => {
           return;
         }
 
+        if (Date.now() - startTime > timeoutMs) {
+          clearInterval(checkInterval);
+          reject(new Error("Timeout"));
+          return;
+        }
+
         const status = realtimeStatusRef.current;
         const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
         const currentX = baseOriginX + status.x;
         const currentY = ORIGIN_Y + status.y;
+        const currentTheta = status.theta;
 
         const dist = Math.hypot(currentX - targetX, currentY - targetY);
-        let diffDegree = status.theta - targetDegree;
+        let diffDegree = currentTheta - targetDegree;
         diffDegree = ((diffDegree + 540) % 360) - 180;
 
         if (
