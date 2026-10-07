@@ -5,7 +5,7 @@ import { useController, useModeStore } from "../../hooks/useController";
 
 // 目標地点の物理座標 (mm) と到着判定の閾値
 const TARGET_X = 4447;
-const TARGET_Y = 4866;
+const TARGET_Y = 4896;
 const TARGET_DEGREE = -75.89;
 const ARRIVAL_THRESHOLD = 50;
 const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
