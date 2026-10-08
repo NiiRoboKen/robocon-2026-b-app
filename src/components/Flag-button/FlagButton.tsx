@@ -6,9 +6,9 @@ import { useController, useModeStore } from "../../hooks/useController";
 // 目標地点の物理座標 (mm) と到着判定の閾値
 const TARGET_X = 4279;
 const TARGET_Y = 4987;
-const TARGET_DEGREE = -75.89;
+const TARGET_DEGREE = -77.89;
 const ARRIVAL_THRESHOLD = 50;
-const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
+const ANGLE_THRESHOLD = 4; // 角度の許容範囲 (度)
 
 // 座標変換用のフィールド定数
 const ORIGIN_X = 3900;
@@ -93,7 +93,7 @@ export const FlagButton = () => {
 
         const status = realtimeStatusRef.current;
         const baseOriginX = mode === "red" ? FIELD_WIDTH - ORIGIN_X : ORIGIN_X;
-        const currentX = baseOriginX - status.x;
+        const currentX = baseOriginX + status.x;
         const currentY = ORIGIN_Y + status.y;
         const currentTheta = status.theta;
 

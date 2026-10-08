@@ -4,11 +4,11 @@ import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
 
 const TARGET_X = 3226;
-const TARGET_Y = 4046;
-const TARGET_DEGREE = -88.35;
+const TARGET_Y = 3950;
+const TARGET_DEGREE = -89.5;
 const ARRIVAL_THRESHOLD = 50;
-const ANGLE_THRESHOLD = 2;
-const LounchDelay = 5000;
+const ANGLE_THRESHOLD = 4;
+const LounchDelay = 3000;
 const OUTPUT_PWM = 1500;
 const OUTPUT_TIME = 0.3;
 
