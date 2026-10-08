@@ -11,16 +11,14 @@ import {
   HStack,
   VStack,
 } from "@chakra-ui/react";
-
 import { BeltoOutputSlider } from "./components/Belt-output-slider/Belt-output-slider.tsx";
-// import { Preset } from "./components/preset/Preset.tsx";
 import { ManualControl } from "./components/manual-control/ManualControl.tsx";
 import ChangeThemeButton from "./components/change-theme-button/ChangeThemeButton.tsx";
 import AllStopButton from "./components/stop-button/StopButton.tsx";
 import { LaunchButton } from "./components/Launch-button/LaunchButton.tsx";
 import { useModeStore } from "./hooks/useController.ts";
 import ResetButton from "./components/Reset-button/ResetButton.tsx";
-import { setting } from "./controller.ts";
+import { ModeTheme, setting } from "./controller.ts";
 // import { MoveAndLaunchButton } from "./components/Move-and-launch-button/MoveAndLaunchButton.tsx";
 import { LoadButton } from "./components/Load-button/LoadButton.tsx";
 import { FlagButton } from "./components/Flag-button/FlagButton.tsx";
@@ -36,6 +34,7 @@ const App = () => {
 
   const mode = useModeStore((state) => state.mode);
   const theme = mode as "blue" | "red";
+  const colorTheme = ModeTheme[theme];
 
   const fieldRef = useRef<HTMLDivElement>(null);
   const [fieldSize, setFieldSize] = useState({ w: 1, h: 1 });
@@ -112,11 +111,11 @@ const App = () => {
             p={0}
             align="stretch"
             overflow="hidden"
+            backgroundColor={colorTheme.colors.backGround}
           >
             <Box p={2} borderBottom="1px solid" borderColor="gray.600">
               <HStack>
                 <ChangeThemeButton />
-                {/* 座標やrealtimeStatusは子コンポーネント内で直接取得 */}
                 <RobotCoordinate
                   connected={status === "CONNECTING" && espConnecting}
                 />
@@ -143,7 +142,6 @@ const App = () => {
                 transform={`translate(${offsetX}px, ${offsetY}px) scale(${fieldScale})`}
               >
                 <SetLocation />
-                {/* 座標計算は内部で行う */}
                 <Robot theme={theme} />
               </Box>
             </Box>

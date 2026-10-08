@@ -75,7 +75,7 @@ export const setting = new Setting();
 class modeTheme {
   blue = {
     colors: {
-      backGround: "#87CEFA",
+      backGround: "#1E90FF",
       workingArea: "#6495ED",
       other: "#1E90FF",
       robotColor: "#FF0000",
@@ -84,7 +84,7 @@ class modeTheme {
   };
   red = {
     colors: {
-      backGround: "#FFC0CB",
+      backGround: "#FF0000",
       workingArea: " 	#FF69B4",
       other: "#FF0000",
       robotColor: "#1E90FF",
