@@ -3,14 +3,14 @@ import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
 
-const TARGET_X = 3026;
-const TARGET_Y = 3950;
-const TARGET_DEGREE = -90.0;
-const ARRIVAL_THRESHOLD = 50;
-const ANGLE_THRESHOLD = 1.5;
-const LounchDelay = 3000;
-const OUTPUT_PWM = 1500;
-const OUTPUT_TIME = 0.3;
+const TARGET_X = 3026; // 目標地点のX座標 (mm) 青ゾーン左下基準
+const TARGET_Y = 3950; // 目標地点のY座標 (mm)
+const TARGET_DEGREE = -90.0; // 目標地点の角度 (度)
+const ARRIVAL_THRESHOLD = 50; // 到着判定の閾値 (mm)
+const ANGLE_THRESHOLD = 1.5; // 角度の許容範囲 (度)
+const LounchDelay = 3000; // バケツを発射するまでの待機時間 (ms)
+const OUTPUT_PWM = 1500; // バケツを発射PWM
+const OUTPUT_TIME = 0.3; // バケツを発射時間 (s)
 
 const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;

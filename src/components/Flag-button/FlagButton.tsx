@@ -4,12 +4,12 @@ import { useWebSocket } from "../../websocket";
 import { useController, useModeStore } from "../../hooks/useController";
 
 // 目標地点の物理座標 (mm) と到着判定の閾値
-const TARGET_X = 4279;
-const TARGET_Y = 5187;
-const TARGET_DEGREE = -80.89;
-const ARRIVAL_THRESHOLD = 50;
+const TARGET_X = 4279; // 目標地点のX座標 (mm) 青ゾーン左下基準
+const TARGET_Y = 5187; // 目標地点のY座標 (mm)
+const TARGET_DEGREE = -80.89; // 目標地点の角度 (度) 直角右側が-90度
+const ARRIVAL_THRESHOLD = 50; // 到着判定の閾値 (mm)
 const ANGLE_THRESHOLD = 2; // 角度の許容範囲 (度)
-
+const LounchDelay = 500; // 位置と角度があってから旗を射出するまでの時間 (ms)
 // 座標変換用のフィールド定数
 const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;
@@ -146,7 +146,7 @@ export const FlagButton = () => {
       });
 
       await waitForArrival(destX, TARGET_Y, destDegree, signal);
-      await sleep(500, signal);
+      await sleep(LounchDelay, signal);
       setSequenceState("shooting");
       sendCommandSafe({
         command: "shoot",
