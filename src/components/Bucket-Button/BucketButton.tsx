@@ -3,11 +3,11 @@ import { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "../../websocket";
 import { useModeStore } from "../../hooks/useController";
 
-const TARGET_X = 3226;
+const TARGET_X = 3026;
 const TARGET_Y = 3950;
-const TARGET_DEGREE = -89.5;
+const TARGET_DEGREE = -90.0;
 const ARRIVAL_THRESHOLD = 50;
-const ANGLE_THRESHOLD = 4;
+const ANGLE_THRESHOLD = 1.5;
 const LounchDelay = 3000;
 const OUTPUT_PWM = 1500;
 const OUTPUT_TIME = 0.3;

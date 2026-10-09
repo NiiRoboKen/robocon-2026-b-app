@@ -13,7 +13,15 @@ const TARGET_X = FIELD_WIDTH + 1800;
 const TARGET_Y = 0;
 const ANGLE_THRESHOLD = 2;
 const ARRIVAL_THRESHOLD = 50;
-const MAX_SHOOT_RANGE = 3500;
+
+// 撃つ距離の上限(mm)。威力(pwm)は距離から計算し、上限の2999なら約8000mmまで届く。
+// 補充スポットから離れて撃てるように、3500から4000へ広げた
+const MAX_SHOOT_RANGE = 4000;
+
+// 撃つ位置(青の座標)。的(7500, 0)まで約3996mm。
+// 補充スポットまで約620mm、道中の障害物とも140mm以上離れる位置を、
+// 経路探索と同じ障害物マップで探して決めた。赤は左右反転(getThemedX)で使う。
+const SHOOT_POSE_BLUE = { x: 4100, y: 2100 };
 
 const RAIL_LENGTH = 0.88;
 const GRAVITY = 9.8;
@@ -69,24 +77,12 @@ const IntimidationButton = () => {
       return;
     }
 
-    const { x: currentX, y: currentY } = getCurrentPose(realtimeStatus, mode);
-
+    // 的と撃つ位置(絶対座標。赤は左右反転)
     const absoluteTargetX = getThemedX(TARGET_X, mode);
+    const destX = getThemedX(SHOOT_POSE_BLUE.x, mode);
+    const destY = SHOOT_POSE_BLUE.y;
 
-    const distToTarget = Math.hypot(
-      absoluteTargetX - currentX,
-      TARGET_Y - currentY,
-    );
-
-    let destX = currentX;
-    let destY = currentY;
-
-    if (distToTarget > MAX_SHOOT_RANGE) {
-      const ratio = MAX_SHOOT_RANGE / distToTarget;
-      destX = absoluteTargetX + (currentX - absoluteTargetX) * ratio;
-      destY = TARGET_Y + (currentY - TARGET_Y) * ratio;
-    }
-
+    // 撃つ位置から的へ向く角度
     const dx = absoluteTargetX - destX;
     const dy = TARGET_Y - destY;
     const rawDegree = Math.atan2(-dx, dy) * (180 / Math.PI);
@@ -143,6 +139,16 @@ const IntimidationButton = () => {
         absoluteTargetX - currentX,
         TARGET_Y - currentY,
       );
+
+      // 撃つ位置から大きくずれて止まったときは、威力を計算しても当たらないので撃たない
+      if (actualDistToTarget > MAX_SHOOT_RANGE + 300) {
+        console.warn("的まで遠すぎるので発射しません", actualDistToTarget);
+        setSequenceState("idle");
+        setApproachPose(null);
+        return;
+      }
+
+      // 威力は、実際の的までの距離から決める
       const { pwm, time } = calculateShootParams(actualDistToTarget);
 
       isOurCommand.current = true;
