@@ -108,9 +108,9 @@ export const ManualControl = () => {
           </Text>
 
           <Slider.Root
-            defaultValue={[200]}
+            defaultValue={[110]}
             min={100}
-            max={1000}
+            max={600}
             step={10}
             onValueChange={(e) => setPwm(e.value[0])}
             colorPalette="yellow"
