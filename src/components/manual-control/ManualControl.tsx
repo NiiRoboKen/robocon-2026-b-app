@@ -108,7 +108,7 @@ export const ManualControl = () => {
           </Text>
 
           <Slider.Root
-            defaultValue={[110]}
+            defaultValue={[110]} // マニュアルの初期値
             min={100}
             max={600}
             step={10}
