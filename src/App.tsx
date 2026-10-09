@@ -163,18 +163,28 @@ const App = () => {
             <AllStopButton />
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
-            <HStack flexWrap="wrap">
-              <LaunchButton />
-            </HStack>
-            <LoadButton />
 
-            <HStack flexWrap="wrap">
-              <FlagButton />
-              <BucketButton />
-              <IntimidationButton />
-            </HStack>
+            <Box w="100%">
+              <LaunchButton />
+            </Box>
+
+            <Box w="100%">
+              <LoadButton />
+            </Box>
 
             <ManualControl />
+
+            <Box w="100%">
+              <BucketButton />
+            </Box>
+
+            <Box w="100%">
+              <IntimidationButton />
+            </Box>
+
+            <Box w="100%">
+              <FlagButton />
+            </Box>
           </VStack>
         </HStack>
       </Box>

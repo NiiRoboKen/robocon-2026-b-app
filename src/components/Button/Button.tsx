@@ -16,6 +16,7 @@ export const Button = ({ children, onClick, className, bg }: Props) => {
       px="24px"
       py="12px"
       minH="72px"
+      w="100%"
       _active={{
         transform: "translateY(3px)",
       }}
