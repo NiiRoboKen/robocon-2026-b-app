@@ -187,7 +187,12 @@ export const FlagButton = () => {
     <div>
       <Button
         onClick={handleClick}
-        bg={sequenceState === "idle" ? "cyan.400" : "red.500"}
+        bg={sequenceState === "idle" ? undefined : "red.500"}
+        background={
+          sequenceState === "idle"
+            ? "linear-gradient(to right, #ff0000, #ff8800, #ffff00, #00cc44, #0088ff, #8800ff)"
+            : undefined
+        }
       >
         {sequenceState === "idle" ? "移動&旗" : "キャンセル"}
       </Button>

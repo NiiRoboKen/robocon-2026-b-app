@@ -32,7 +32,7 @@ const calculateShootParams = (distanceMm: number) => {
   const requiredV0 = Math.sqrt(distanceM * GRAVITY);
   const requiredA = (requiredV0 * requiredV0) / (2 * RAIL_LENGTH);
 
-  let pwm = Math.round((requiredA + 14.62) / 0.0198);
+  let pwm = Math.round((requiredA + 14.62) / 0.0198 - 50);
   pwm = Math.min(2999, Math.max(0, pwm));
 
   const actualA = 0.0198 * pwm - 14.62;
