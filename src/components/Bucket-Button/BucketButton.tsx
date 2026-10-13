@@ -12,6 +12,7 @@ const LounchDelay = 3000; // バケツを発射するまでの待機時間 (ms)
 const OUTPUT_PWM = 1500; // バケツを発射PWM
 const OUTPUT_TIME = 0.3; // バケツを発射時間 (s)
 
+
 const ORIGIN_X = 3900;
 const ORIGIN_Y = 500;
 const FIELD_WIDTH = 5700;

@@ -27,6 +27,14 @@ export const FlagButton = () => {
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const isOurCommand = useRef(false);
+  // 発行したsetTimeoutのIDを保持する配列
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+
+  // 保持しているすべてのタイマーを破棄する関数
+  const clearAllTimeouts = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  };
 
   // 非同期ループ内で最新の座標を参照するためのRef
   const realtimeStatusRef = useRef(realtimeStatus);
