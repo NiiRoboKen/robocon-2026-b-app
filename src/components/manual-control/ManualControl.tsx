@@ -8,12 +8,21 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useWebSocket } from "../../websocket";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export const ManualControl = () => {
   const [pwm, setPwm] = useState(500);
   const { sendMessage } = useWebSocket();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
 
   const startMove = (
     direction: "up" | "down" | "left" | "right" | "ccw" | "cw",
@@ -99,9 +108,9 @@ export const ManualControl = () => {
           </Text>
 
           <Slider.Root
-            defaultValue={[200]}
+            defaultValue={[110]} // マニュアルの初期値
             min={100}
-            max={1000}
+            max={600}
             step={10}
             onValueChange={(e) => setPwm(e.value[0])}
             colorPalette="yellow"

@@ -6,9 +6,16 @@ type Props = {
   onClick?: () => void;
   className?: string;
   bg?: string;
+  background?: string;
 };
 
-export const Button = ({ children, onClick, className, bg }: Props) => {
+export const Button = ({
+  children,
+  onClick,
+  className,
+  bg,
+  background,
+}: Props) => {
   return (
     <ChakraButton
       color="white"
@@ -16,12 +23,14 @@ export const Button = ({ children, onClick, className, bg }: Props) => {
       px="24px"
       py="12px"
       minH="72px"
+      w="100%"
       _active={{
         transform: "translateY(3px)",
       }}
       onClick={onClick}
       className={className}
       bg={bg}
+      background={background}
       rounded="3xl"
     >
       {children}

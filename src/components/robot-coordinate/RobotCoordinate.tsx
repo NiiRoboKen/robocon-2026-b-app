@@ -1,16 +1,26 @@
+import { useWebSocket } from "../../websocket";
+import { useModeStore } from "../../hooks/useController";
+import { setting } from "../../controller";
+
 type RobotCoordinateProps = {
-  x: number;
-  y: number;
-  theta?: number;
   connected?: boolean;
 };
 
-export const RobotCoordinate = ({
-  x,
-  y,
-  theta,
-  connected = true,
-}: RobotCoordinateProps) => {
+const ORIGIN_X = 3900;
+const ORIGIN_Y = 500;
+
+export const RobotCoordinate = ({ connected = true }: RobotCoordinateProps) => {
+  // realtimeStatusだけを監視し、100ms周期でここだけが再レンダリングされるようにする
+  const realtimeStatus = useWebSocket((state) => state.realtimeStatus);
+  const mode = useModeStore((state) => state.mode);
+
+  // 絶対座標の計算
+  const baseOriginX =
+    mode === "red" ? setting.fieldSize.width - ORIGIN_X : ORIGIN_X;
+  const x = baseOriginX + realtimeStatus.x;
+  const y = ORIGIN_Y + realtimeStatus.y;
+  const theta = realtimeStatus.theta;
+
   return (
     <div
       style={{
@@ -33,7 +43,7 @@ export const RobotCoordinate = ({
       >
         <span>x: {Math.round(x)}</span>
         <span>y: {Math.round(y)}</span>
-        {typeof theta === "number" && <span>θ: {theta.toFixed(2)}</span>}
+        <span>θ: {theta.toFixed(2)}</span>
         <span
           style={{
             marginLeft: "auto",
