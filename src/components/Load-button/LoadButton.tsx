@@ -5,6 +5,12 @@ export const LoadButton = () => {
   const { sendMessage } = useWebSocket();
 
   const handleLoad = () => {
+    const se = new Audio("/sounds/load.mp3");
+    se.volume = 0.8;
+    se.currentTime = 0;
+    se.play().catch((error) => {
+      console.error("SEの再生に失敗しました:", error);
+    });
     sendMessage({
       command: "load",
     });

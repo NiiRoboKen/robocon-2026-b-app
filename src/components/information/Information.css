@@ -1,9 +1,96 @@
 .info {
   display: flex;
+  gap: 20px;
+  justify-content: center;
 }
-.box {
-  padding: 0.5em 1em;
-  margin: 2em 0;
-  font-weight: bold;
-  border: solid 2px #000000;
+
+.pachinko-info-container {
+  background: repeating-linear-gradient(
+    45deg,
+    #222,
+    #222 10px,
+    #000 10px,
+    #000 20px
+  );
+  padding: 20px;
+  border: 5px dashed #ff00ff;
+  box-shadow: 0 0 30px #00ffff;
+  border-radius: 20px;
+  animation: border-dance 1s infinite linear;
+}
+
+.pachinko-title {
+  font-size: 2.5em;
+  text-align: center;
+  color: #ffff00;
+  text-shadow:
+    0 0 10px #ff0000,
+    0 0 20px #ff0000,
+    0 0 40px #ff0000;
+  margin-bottom: 20px;
+  font-weight: 900;
+}
+
+.pachinko-box {
+  background: linear-gradient(135deg, #ff0000, #ff00ff);
+  border: 4px solid #ffff00;
+  border-radius: 15px;
+  padding: 1em 1.5em;
+  box-shadow:
+    inset 0 0 20px #000,
+    0 0 20px #ff00ff;
+  animation: box-pulse 0.3s infinite alternate;
+}
+
+.pachinko-subtitle {
+  color: #ffffff;
+  font-size: 1.5em;
+  text-align: center;
+  text-shadow:
+    2px 2px 0 #000,
+    0 0 10px #00ffff;
+  margin-bottom: 15px;
+  border-bottom: 3px dashed #ffff00;
+  padding-bottom: 5px;
+  font-weight: 900;
+}
+
+.pachinko-data {
+  font-size: 1.2em;
+  color: #00ffff;
+  font-weight: 900;
+  text-shadow: 1px 1px 0 #000;
+  margin: 10px 0;
+}
+
+.pachinko-data span {
+  color: #ffff00;
+  font-size: 1.4em;
+  text-shadow: 0 0 10px #ff0000;
+  animation: value-flicker 0.1s infinite alternate;
+}
+
+@keyframes border-dance {
+  100% {
+    border-color: #00ffff;
+    box-shadow: 0 0 30px #ff00ff;
+  }
+}
+@keyframes box-pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+}
+@keyframes value-flicker {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+    text-shadow: 0 0 20px #ffffff;
+  }
 }

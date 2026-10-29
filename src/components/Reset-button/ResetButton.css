@@ -1,0 +1,130 @@
+.reset-wrapper {
+  width: 100%;
+  height: 60px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* =========================
+   リセットボタン（確変ブルー仕様）
+========================= */
+.pachinko-reset-button {
+  position: relative;
+  width: 100%;
+  height: 100% !important;
+
+  /* 青〜水色のグラデーション */
+  background: linear-gradient(135deg, #0011ff, #00d4ff) !important;
+  border: 3px solid #00ffff !important;
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+
+  /* 文字のネオン発光 */
+  text-shadow:
+    0 0 5px #00ffff,
+    0 0 15px #0055ff,
+    2px 2px 0 #000,
+    -2px -2px 0 #000 !important;
+
+  /* 立体感と外側の発光 */
+  box-shadow:
+    0 6px 0 #001188,
+    0 0 15px rgba(0, 255, 255, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.5) !important;
+
+  overflow: hidden;
+  cursor: pointer;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+
+  /* 全体が脈打つアニメーション */
+  animation: reset-pulse 1s infinite alternate;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+  z-index: 1;
+}
+
+/* キラッと光る斜めの線 */
+.pachinko-reset-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+  transform: skewX(-25deg);
+  animation: reset-shine 2.5s infinite;
+  z-index: -1;
+}
+
+/* 押したときの沈み込み */
+.pachinko-reset-button:active {
+  transform: translateY(6px);
+  box-shadow:
+    0 0px 0 #001188,
+    0 0 10px rgba(0, 255, 255, 0.4),
+    inset 0 0 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 🌀アイコンを回転させる */
+.reset-icon {
+  display: inline-block;
+  font-size: 24px;
+  animation: spin-icon 2s linear infinite;
+  filter: drop-shadow(0 0 5px #00ffff);
+}
+
+/* =========================
+   アニメーション定義
+========================= */
+@keyframes reset-pulse {
+  0% {
+    box-shadow:
+      0 6px 0 #001188,
+      0 0 10px rgba(0, 255, 255, 0.4);
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    box-shadow:
+      0 6px 0 #001188,
+      0 0 25px rgba(0, 255, 255, 0.9),
+      0 0 45px rgba(0, 85, 255, 0.6);
+    filter: hue-rotate(15deg); /* 色が微妙に変わる */
+  }
+}
+
+@keyframes reset-shine {
+  0% {
+    left: -100%;
+  }
+  15% {
+    left: 200%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+@keyframes spin-icon {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}

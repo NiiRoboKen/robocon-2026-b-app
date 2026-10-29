@@ -1,17 +1,11 @@
-import {
-  Box,
-  Grid,
-  GridItem,
-  Button,
-  Slider,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Grid, GridItem, Slider, Text, VStack } from "@chakra-ui/react";
 import { useWebSocket } from "../../websocket";
 import { useRef, useState, useEffect } from "react";
+import "./ManualControl.css";
 
 export const ManualControl = () => {
   const [pwm, setPwm] = useState(500);
+  const [flashBtn, setFlashBtn] = useState<string | null>(null);
   const { sendMessage } = useWebSocket();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -27,10 +21,10 @@ export const ManualControl = () => {
   const startMove = (
     direction: "up" | "down" | "left" | "right" | "ccw" | "cw",
   ) => {
+    setFlashBtn(direction);
     let vx = 0,
       vy = 0,
       vtheta = 0;
-
     switch (direction) {
       case "up":
         vx = pwm;
@@ -53,14 +47,13 @@ export const ManualControl = () => {
     }
 
     if (intervalRef.current) clearInterval(intervalRef.current);
-
     const send = () => sendMessage({ command: "manual_move", vx, vy, vtheta });
-
     send();
     intervalRef.current = setInterval(send, 100);
   };
 
   const stopMove = () => {
+    setFlashBtn(null);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -87,6 +80,9 @@ export const ManualControl = () => {
       e.preventDefault();
       stopMove();
     },
+    className: `controller-button ${
+      dir === "ccw" || dir === "cw" ? "rotate-button" : "move-button"
+    } ${flashBtn === dir ? "button-flash" : ""}`,
     style: {
       userSelect: "none" as const,
       touchAction: "none" as const,
@@ -94,117 +90,65 @@ export const ManualControl = () => {
   });
 
   return (
-    <VStack borderWidth="1px" borderRadius="md" p={4} align="stretch" gap={6}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        gap={6}
-      >
-        <Box w="100%" maxW="300px">
-          <Text fontSize="sm" fontWeight="bold" mb={6}>
-            PWM
+    <VStack className="manual-control" p={3} align="stretch" gap={4} w="100%">
+      <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+        {/* PWMスライダー */}
+        <Box w="100%" maxW="280px" className="slider-section">
+          <Text className="slider-label" fontSize="xs" fontWeight="bold" mb={1}>
+            MANUAL PWM <span className="slider-unit">{pwm}</span>
           </Text>
-
           <Slider.Root
-            defaultValue={[110]} // マニュアルの初期値
+            defaultValue={[500]}
             min={100}
             max={600}
             step={10}
             onValueChange={(e) => setPwm(e.value[0])}
-            colorPalette="yellow"
           >
             <Slider.Control>
               <Slider.Track>
                 <Slider.Range />
               </Slider.Track>
-
-              <Slider.Thumb index={0}>
-                <Slider.ValueText
-                  position="absolute"
-                  bottom="100%"
-                  mb="8px"
-                  fontSize="sm"
-                  fontWeight="bold"
-                  whiteSpace="nowrap"
-                />
-              </Slider.Thumb>
+              <Slider.Thumb index={0} />
             </Slider.Control>
           </Slider.Root>
         </Box>
 
-        <Grid templateColumns="repeat(3, 1fr)" gap={2} w="300px">
-          <GridItem colStart={2}>
-            <Button
-              w="100%"
-              h="60px"
-              bg="blue.500"
-              color="white"
-              {...bindEvents("up")}
-            >
-              前
-            </Button>
-          </GridItem>
-
-          <GridItem colStart={1} rowStart={2}>
-            <Button
-              w="100%"
-              h="60px"
-              bg="blue.500"
-              color="white"
-              {...bindEvents("left")}
-            >
-              左
-            </Button>
-          </GridItem>
-
-          <GridItem colStart={2} rowStart={3}>
-            <Button
-              w="100%"
-              h="60px"
-              bg="blue.500"
-              color="white"
-              {...bindEvents("down")}
-            >
-              後
-            </Button>
-          </GridItem>
-
-          <GridItem colStart={3} rowStart={2}>
-            <Button
-              w="100%"
-              h="60px"
-              bg="blue.500"
-              color="white"
-              {...bindEvents("right")}
-            >
-              右
-            </Button>
-          </GridItem>
-
+        {/* コントローラーグリッド */}
+        <Grid templateColumns="repeat(3, 1fr)" gap={2} w="100%" maxW="280px">
+          {/* 上段 */}
           <GridItem colStart={1} rowStart={1}>
-            <Button
-              w="100%"
-              h="60px"
-              bg="yellow.500"
-              color="white"
-              {...bindEvents("ccw")}
-            >
-              左回転
-            </Button>
+            <button {...bindEvents("ccw")}>
+              <span className="arrow">↺</span>
+            </button>
+          </GridItem>
+          <GridItem colStart={2} rowStart={1}>
+            <button {...bindEvents("up")}>
+              <span className="arrow">▲</span>
+            </button>
+          </GridItem>
+          <GridItem colStart={3} rowStart={1}>
+            <button {...bindEvents("cw")}>
+              <span className="arrow">↻</span>
+            </button>
           </GridItem>
 
-          <GridItem colStart={3} rowStart={1}>
-            <Button
-              w="100%"
-              h="60px"
-              bg="yellow.500"
-              color="white"
-              {...bindEvents("cw")}
-            >
-              右回転
-            </Button>
+          {/* 中段 */}
+          <GridItem colStart={1} rowStart={2}>
+            <button {...bindEvents("left")}>
+              <span className="arrow">◀</span>
+            </button>
+          </GridItem>
+          <GridItem colStart={3} rowStart={2}>
+            <button {...bindEvents("right")}>
+              <span className="arrow">▶</span>
+            </button>
+          </GridItem>
+
+          {/* 下段 */}
+          <GridItem colStart={2} rowStart={3}>
+            <button {...bindEvents("down")}>
+              <span className="arrow">▼</span>
+            </button>
           </GridItem>
         </Grid>
       </Box>

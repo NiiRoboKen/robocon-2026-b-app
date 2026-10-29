@@ -1,0 +1,60 @@
+.pachinko-button {
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #ffd700 !important;
+  box-shadow:
+    0 0 15px #ff00ff,
+    inset 0 0 15px #ffff00 !important;
+  animation: button-pulse 0.5s infinite alternate !important;
+  text-shadow:
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    0 0 20px #fff !important;
+  z-index: 1;
+}
+
+.pachinko-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shine 1.5s infinite;
+  z-index: -1;
+}
+
+@keyframes button-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 0 10px #ff00ff,
+      inset 0 0 10px #ffff00;
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    transform: scale(1.02);
+    box-shadow:
+      0 0 30px #00ffff,
+      inset 0 0 30px #ff00ff;
+    filter: hue-rotate(90deg);
+  }
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Button as ChakraButton } from "@chakra-ui/react";
+import "./Button.css";
 
 type Props = {
   children?: ReactNode;
@@ -19,18 +20,18 @@ export const Button = ({
   return (
     <ChakraButton
       color="white"
-      fontSize="20px"
+      fontSize="24px"
+      fontWeight="black"
       px="24px"
       py="12px"
       minH="72px"
       w="100%"
       _active={{
-        transform: "translateY(3px)",
+        transform: "translateY(5px) scale(0.95)",
       }}
       onClick={onClick}
-      className={className}
-      bg={bg}
-      background={background}
+      className={`pachinko-button ${className || ""}`}
+      background={background || bg}
       rounded="3xl"
     >
       {children}

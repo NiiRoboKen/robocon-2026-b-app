@@ -1,0 +1,290 @@
+@property --scan-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.manual-control {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
+
+  background: linear-gradient(145deg, #11151a, #202730);
+  border: 2px solid #2488ff !important;
+  border-radius: 12px !important;
+
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 10px rgba(36, 136, 255, 0.8),
+    0 0 20px rgba(36, 136, 255, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.55);
+
+  animation: preset-frame-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes preset-frame-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 4px rgba(255, 255, 255, 0.9),
+      0 0 10px rgba(36, 136, 255, 0.8),
+      0 0 20px rgba(36, 136, 255, 0.35),
+      0 8px 20px rgba(0, 0, 0, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 6px rgba(255, 255, 255, 1),
+      0 0 15px rgba(36, 136, 255, 1),
+      0 0 30px rgba(36, 136, 255, 0.6),
+      0 8px 20px rgba(0, 0, 0, 0.55);
+  }
+}
+
+.manual-control::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 14px;
+  padding: 3px;
+
+  background: conic-gradient(
+    from var(--scan-angle),
+    transparent 0deg,
+    transparent 270deg,
+    rgba(36, 136, 255, 0.15) 300deg,
+    rgba(36, 136, 255, 0.6) 330deg,
+    rgba(120, 200, 255, 0.9) 348deg,
+    #ffffff 357deg,
+    #ffffff 360deg
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px #2488ff)
+    drop-shadow(0 0 15px #2488ff) drop-shadow(0 0 25px rgba(36, 136, 255, 0.6));
+
+  pointer-events: none;
+  z-index: 10;
+  animation: preset-border-glow 2.2s linear infinite;
+}
+
+.manual-control::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 14px;
+  padding: 3px;
+
+  background: conic-gradient(
+    from var(--scan-angle),
+    transparent 0deg,
+    transparent 355deg,
+    #ffffff 358deg,
+    #ffffff 360deg
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px #ffffff)
+    drop-shadow(0 0 20px #66bbff);
+
+  pointer-events: none;
+  z-index: 11;
+  animation: preset-border-glow 2.2s linear infinite;
+}
+
+@keyframes preset-border-glow {
+  from {
+    --scan-angle: 0deg;
+  }
+  to {
+    --scan-angle: 360deg;
+  }
+}
+
+/* =========================
+   スライダー
+========================= */
+.slider-section {
+  padding: 0 4px;
+}
+
+.slider-label {
+  color: #e8f3ff;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.slider-unit {
+  margin-left: 6px;
+  color: #42a5ff;
+  font-size: 14px;
+  text-shadow:
+    0 0 6px #2488ff,
+    0 0 10px rgba(36, 136, 255, 0.7);
+}
+
+.manual-control [data-part="track"] {
+  background: #252b33;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8);
+  height: 6px;
+}
+
+.manual-control [data-part="range"] {
+  background: linear-gradient(90deg, #006eff, #00c8ff);
+  box-shadow:
+    0 0 5px #008cff,
+    0 0 10px rgba(0, 140, 255, 0.7);
+}
+
+.manual-control [data-part="thumb"] {
+  background: #dff6ff;
+  border: 2px solid #008cff;
+  width: 16px;
+  height: 16px;
+  box-shadow:
+    0 0 4px #008cff,
+    0 0 10px #008cff,
+    0 0 15px rgba(0, 140, 255, 0.5);
+}
+
+/* =========================
+   操作パネル (ボタン)
+========================= */
+.controller-button {
+  position: relative;
+  width: 100%;
+  height: 45px !important; /* 余白削減のため55px -> 45pxへ縮小 */
+
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px !important;
+
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  cursor: pointer;
+
+  transition:
+    transform 0.08s ease,
+    filter 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+.controller-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.35s ease;
+}
+
+.controller-button:hover::before {
+  left: 150%;
+}
+
+.controller-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
+}
+
+.controller-button:active {
+  transform: translateY(2px) scale(0.95);
+  filter: brightness(1.5);
+}
+
+/* =========================
+   移動ボタン (青)
+========================= */
+.move-button {
+  background: linear-gradient(145deg, #1677ff, #0044aa) !important;
+  box-shadow:
+    0 3px 0 #002d70,
+    0 0 6px rgba(30, 144, 255, 0.5);
+}
+
+.move-button:hover {
+  box-shadow:
+    0 3px 0 #002d70,
+    0 0 10px #1685ff,
+    0 0 20px rgba(30, 144, 255, 0.65);
+}
+
+/* =========================
+   回転ボタン (黄)
+========================= */
+.rotate-button {
+  background: linear-gradient(145deg, #ffc928, #c47a00) !important;
+  box-shadow:
+    0 3px 0 #774800,
+    0 0 6px rgba(255, 190, 0, 0.5);
+}
+
+.rotate-button:hover {
+  box-shadow:
+    0 3px 0 #774800,
+    0 0 10px #ffc400,
+    0 0 20px rgba(255, 190, 0, 0.7);
+}
+
+/* 矢印アイコン */
+.arrow {
+  font-size: 16px;
+  line-height: 1;
+  text-shadow:
+    0 0 4px white,
+    0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* =========================
+  クリック時の発光
+========================= */
+.button-flash {
+  animation: controller-button-flash 0.25s ease-out !important;
+}
+
+@keyframes controller-button-flash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(0.9);
+    filter: brightness(2);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(2.5);
+    box-shadow:
+      0 0 15px white,
+      0 0 30px currentColor,
+      0 0 50px currentColor;
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}

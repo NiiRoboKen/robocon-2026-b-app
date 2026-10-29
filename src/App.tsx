@@ -154,13 +154,16 @@ const App = () => {
             minH={0}
             align="stretch"
             justify="flex-start"
-            gap={4}
+            gap={2}
             m={0}
-            p={4}
+            p={2}
             overflow="hidden"
+            // overflowY="auto"
             overflowWrap="break-word"
           >
-            <AllStopButton />
+            <Box display="flex" justifyContent="center">
+              <AllStopButton />
+            </Box>
             <ResetButton onReset={handleReset} />
             <BeltoOutputSlider />
 

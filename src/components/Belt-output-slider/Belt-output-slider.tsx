@@ -1,15 +1,32 @@
 import { Box, Slider, Text } from "@chakra-ui/react";
 import { useController } from "../../hooks/useController";
+import "./Belt-output-slider.css";
 
 export const BeltoOutputSlider = () => {
   const { shootPwm, setShootPwm, shootTime, setShootTime } = useController();
+
   return (
-    <Box pt="30px">
-      <Text fontSize="sm" fontWeight="bold" mb={8}>
-        発射出力 (9~2999)
+    <Box
+      className="shoot-setting pachinko-container"
+      p={4}
+      borderRadius="xl"
+      w="fit-content"
+      mx="auto"
+    >
+      {/* 発射出力 */}
+      <Text
+        className="shoot-setting__label blink-text"
+        fontSize="sm"
+        fontWeight="bold"
+        mb={6}
+        color="yellow.300"
+      >
+        ★☆ 発射出力 (9~2999) ☆★
       </Text>
+
       <Slider.Root
-        width="300px"
+        className="shoot-slider"
+        width="260px"
         defaultValue={[shootPwm]}
         min={9}
         max={2999}
@@ -26,7 +43,7 @@ export const BeltoOutputSlider = () => {
             <Slider.ValueText
               position="absolute"
               bottom="100%"
-              mb="8px"
+              mb="4px"
               fontSize="sm"
               fontWeight="bold"
               whiteSpace="nowrap"
@@ -35,15 +52,25 @@ export const BeltoOutputSlider = () => {
         </Slider.Control>
       </Slider.Root>
 
-      <Text fontSize="sm" fontWeight="bold" mb={8}>
-        発射時間 (s)
+      {/* 発射時間 */}
+      <Text
+        className="shoot-setting__label shoot-setting__time blink-text"
+        fontSize="sm"
+        fontWeight="bold"
+        mb={6}
+        mt={1}
+        color="yellow.300"
+      >
+        ★☆ 発射時間 (s) ☆★
       </Text>
+
       <Slider.Root
-        width="300px"
+        className="shoot-slider"
+        width="260px"
         defaultValue={[shootTime]}
         min={0.005}
-        max={0.35}
-        step={0.001}
+        max={0.4}
+        step={0.005}
         onValueChangeEnd={(e) => setShootTime(e.value[0])}
         colorPalette="green"
       >
@@ -51,6 +78,7 @@ export const BeltoOutputSlider = () => {
           <Slider.Track>
             <Slider.Range />
           </Slider.Track>
+
           <Slider.Thumb index={0}>
             <Slider.ValueText
               position="absolute"

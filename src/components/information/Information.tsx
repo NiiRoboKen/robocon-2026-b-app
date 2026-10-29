@@ -3,30 +3,40 @@ import { useWebSocket } from "../../websocket";
 import "./Information.css";
 
 const Information = () => {
-	const { targetPositionScale, theta } = useController();
-	const { status, realtimeStatus} = useWebSocket();
-	// const targetPosition = useController((state) => state.targetPosition);
+  const { targetPositionScale, theta } = useController();
+  const { status, realtimeStatus } = useWebSocket();
 
-	return (
-		<div>
-			<h1>{status}</h1>
-			<div className="info">
-				<div className="box">
-					<h2>Target Position</h2>
-					<p>x: {targetPositionScale.x}</p>
-					<p>y: {targetPositionScale.y}</p>
-					<p> theta: {theta} </p>
-				</div>
-
-				<div className="box">
-					<h2>Real Time Position</h2>
-					<p>x: {realtimeStatus.x}</p>
-					<p>y: {realtimeStatus.y}</p>
-					<p>theta: {realtimeStatus.theta}</p>
-				</div>
-			</div>
-		</div>
-	);
+  return (
+    <div className="pachinko-info-container">
+      <h1 className="pachinko-title blink-text">🎰 {status} 🎰</h1>
+      <div className="info">
+        <div className="box pachinko-box">
+          <h2 className="pachinko-subtitle">🎯 Target Position</h2>
+          <p className="pachinko-data">
+            X: <span>{targetPositionScale.x}</span>
+          </p>
+          <p className="pachinko-data">
+            Y: <span>{targetPositionScale.y}</span>
+          </p>
+          <p className="pachinko-data">
+            θ: <span>{theta}</span>
+          </p>
+        </div>
+        <div className="box pachinko-box">
+          <h2 className="pachinko-subtitle">🚀 Real Time Position</h2>
+          <p className="pachinko-data">
+            X: <span>{Math.round(realtimeStatus.x)}</span>
+          </p>
+          <p className="pachinko-data">
+            Y: <span>{Math.round(realtimeStatus.y)}</span>
+          </p>
+          <p className="pachinko-data">
+            θ: <span>{Math.round(realtimeStatus.theta)}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Information;
